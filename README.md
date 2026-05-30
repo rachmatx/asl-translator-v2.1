@@ -49,7 +49,7 @@ graph TD
     %% Backend (FastAPI Server)
     subgraph Server ["Backend (FastAPI Server)"]
         F -->|Terima JSON Array| G[Inference Engine]
-        G -->|Direct Call model_mlp_asl.keras| H[Raw Softmax Probabilities]
+        G -->|Direct Call model_mlp_asl.h5| H[Raw Softmax Probabilities]
         H -->|Rolling Buffer 9 Frame| I[Temporal Smoothing]
         I -->|Max Probability > 50%| J[Deteksi Huruf Terklasifikasi]
         J -->|Kirim Prediksi JSON| K[Kirim Respon ke Klien]
@@ -157,7 +157,7 @@ Server backend akan dimuat, melakukan _warm-up_ model TensorFlow, dan siap mende
 Karena aplikasi sekarang dilayani langsung oleh FastAPI, Anda tidak perlu membuka file HTML secara terpisah atau menggunakan ekstensi Live Server. Cukup buka browser dan akses:
 
 - **Aplikasi Utama**: Akses `http://localhost:8000` - Halaman utama untuk penerjemah ASL, TTS, dan Flashcard.
-- **Kolektor Data & Analisis**: Buka file HTML di dalam folder `tools/` (seperti `collect_data.html` dan `stats.html`) langsung di browser jika ingin merekam gestur baru atau melihat metrik.
+- **Kolektor Data & Analisis (Khusus Lokal)**: File `collect_data.html` dan `stats.html` dalam folder `tools/` hanya tersedia di penyimpanan lokal untuk keperluan pengembangan dan keamanan produksi. Buka langsung di browser lokal Anda.
 
 ---
 
@@ -209,7 +209,7 @@ flowchart LR
     D -->|Simpan File| E[Unduh custom_data.csv]
     E --> F[Jalankan custom_merge.py]
     F -->|Gabungkan ke landmarks_temp.csv| G[Jalankan train.py]
-    G -->|Retrain MLP Model| H[Terbentuk model_mlp_asl.keras]
+    G -->|Retrain MLP Model| H[Terbentuk model_mlp_asl.h5]
     H --> I[Restart main.py Server]
 ```
 
@@ -285,7 +285,7 @@ asl-dump-hibrid/
 │   ├── train.py            # Pipeline ekstraksi fitur, augmentasi data, & pelatihan MLP
 │   └── custom_merge.py     # Alat bantu CLI penggabung CSV data kustom ke dataset utama
 │
-├── tools/                  # Halaman statis tambahan
+├── tools/                  # Halaman statis tambahan (Tidak diunggah ke GitHub / Khusus Lokal)
 │   ├── collect_data.html   # Antarmuka perekam data kustom via kamera klien
 │   └── stats.html          # Antarmuka visual Confusion Matrix & real-time tester
 │
@@ -299,7 +299,7 @@ asl-dump-hibrid/
 ├── index.html              # Aplikasi antarmuka web utama (Penerjemah, TTS, Flashcard)
 ├── Dockerfile              # Konfigurasi container untuk mempermudah deployment
 ├── requirements.txt        # Daftar library python yang wajib diinstal
-├── model_mlp_asl.keras     # Berkas model biner hasil pelatihan
+├── model_mlp_asl.h5        # Berkas model biner hasil pelatihan
 ├── classes.npy             # Mapping kelas biner NumPy untuk huruf keluaran
 └── README.md               # Dokumentasi Proyek (Berkas ini)
 ```
