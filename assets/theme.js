@@ -2,34 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check if we are on the main detector page
   const isIndex = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
   
-  // ── Nav Links (inject on all pages) ───────────────────────────
-  const navContainer = document.createElement('div');
-  navContainer.className = 'nav-links';
 
-  const currentPath = window.location.pathname;
-  const pages = [
-    { href: 'index.html',        label: 'Home',       icon: 'home',       key: 'index'   },
-    { href: 'stats.html',        label: 'Stats',      icon: 'bar_chart',  key: 'stats'   },
-    { href: 'collect_data.html', label: 'Collect',    icon: 'download',   key: 'collect' },
-  ];
-
-  pages.forEach(({ href, label, icon, key }) => {
-    const isActive = currentPath.includes(key) || 
-      (key === 'index' && (currentPath === '/' || currentPath.endsWith('/')));
-    const a = document.createElement('a');
-    a.href = href;
-    a.className = 'nav-link' + (isActive ? ' active' : '');
-    a.innerHTML = `<span class="material-symbols-outlined" 
-      style="font-size:14px;vertical-align:middle">${icon}</span> ${label}`;
-    navContainer.appendChild(a);
-  });
-
-  const footer = document.querySelector('footer');
-  if (footer && footer.parentNode) {
-    footer.parentNode.insertBefore(navContainer, footer);
-  } else {
-    document.body.appendChild(navContainer);
-  }
 
   // Inject Theme Switcher UI into the DOM
   let themeSwitcherHTML = `<div class="theme-switcher">`;

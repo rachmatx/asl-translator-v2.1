@@ -135,14 +135,6 @@ async def serve_index():
 async def serve_index_explicit():
     return FileResponse("index.html")
 
-@app.get("/stats.html", tags=["UI"])
-async def serve_stats():
-    return FileResponse("tools/stats.html")
-
-@app.get("/collect_data.html", tags=["UI"])
-async def serve_collect():
-    return FileResponse("tools/collect_data.html")
-
 
 # ── Health Check ─────────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"])
@@ -156,20 +148,6 @@ async def health_check():
         "classes":     app_state["classes"].tolist() if model_loaded else [],
     }
 
-
-# ── Server Stats Endpoint ───────────────────────────────────────────────────────
-@app.get("/api/stats", tags=["Stats"])
-async def get_stats():
-    s = app_state["session_stats"]
-    uptime = int(time.time() - s["start_time"])
-    return {
-        "uptime_seconds":   uptime,
-        "total_frames":     s["total_frames"],
-        "total_predicted":  s["total_predicted"],
-        "avg_confidence":   round(s["avg_confidence"], 4),
-        "top_letters":      sorted(s["letter_counts"].items(), key=lambda x: -x[1])[:5],
-        "letter_counts":    s["letter_counts"],
-    }
 
 
 # ── Spell Check Endpoint ─────────────────────────────────────────────────────────

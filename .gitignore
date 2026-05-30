@@ -23,6 +23,9 @@ tmp/
 # *.keras
 # *.tflite
 
+# Development Tools
+tools/
+
 # System Cache Files
 .DS_Store
 Thumbs.db
