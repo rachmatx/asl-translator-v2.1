@@ -24,10 +24,11 @@ Membangun alat penerjemah bahasa isyarat ke teks secara langsung (real-time) yan
 - **Reliabilitas Koneksi:** WebSocket harus mampu menangani antrean data secara efisien dan mendukung banyak koneksi ringan tanpa tersumbat (*bottleneck*).
 
 ### 5. Tumpukan Teknologi (Tech Stack)
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript, MediaPipe Hands (CDN).
-- **Backend:** Python 3.11, FastAPI, Uvicorn, WebSockets.
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript, MediaPipe Hands (CDN). *Frontend dilayani langsung secara statis oleh FastAPI*.
+- **Backend:** Python 3.10+, FastAPI, Uvicorn, WebSockets.
 - **Machine Learning:** TensorFlow/Keras (Model Multi-Layer Perceptron), Scikit-Learn (Preprocessing), NumPy.
 - **Utilitas Tambahan:** OpenCV, PySpellChecker (koreksi teks otomatis).
+- **Deployment:** Docker (terdapat `Dockerfile` siap pakai untuk platform cloud seperti Render/Railway).
 
 ### 6. Alur Komunikasi Sistem
 ```mermaid

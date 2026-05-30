@@ -143,11 +143,10 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 Server backend akan dimuat, melakukan *warm-up* model TensorFlow, dan siap mendengarkan WebSocket pada `ws://localhost:8000/ws/predict`.
 
-### 5. Jalankan Aplikasi Frontend
-Buka salah satu file HTML di bawah ini langsung menggunakan browser (Double-click atau gunakan ekstensi VS Code *Live Server*):
-- **Aplikasi Utama**: [`index.html`](file:///c:/Users/R/Documents/@Tugas%20kampus%20semester%204/Data%20Sains/asl%20dump%20hibrid/index.html) - Halaman utama untuk penerjemah ASL, TTS, dan Flashcard.
-- **Kolektor Data**: [`collect_data.html`](file:///c:/Users/R/Documents/@Tugas%20kampus%20semester%204/Data%20Sains/asl%20dump%20hibrid/collect_data.html) - Halaman khusus merekam gestur tangan baru Anda ke format CSV.
-- **Dashboard Analisis**: [`stats.html`](file:///c:/Users/R/Documents/@Tugas%20kampus%20semester%204/Data%20Sains/asl%20dump%20hibrid/stats.html) - Halaman untuk menguji akurasi prediksi model per huruf dan menampilkan matriks kebingungan (*confusion matrix*).
+### 5. Akses Aplikasi Frontend
+Karena aplikasi sekarang dilayani langsung oleh FastAPI, Anda tidak perlu membuka file HTML secara terpisah atau menggunakan ekstensi Live Server. Cukup buka browser dan akses:
+- **Aplikasi Utama**: Akses `http://localhost:8000` - Halaman utama untuk penerjemah ASL, TTS, dan Flashcard.
+- **Kolektor Data & Analisis**: Buka file HTML di dalam folder `tools/` (seperti `collect_data.html` dan `stats.html`) langsung di browser jika ingin merekam gestur baru atau melihat metrik.
 
 ---
 
@@ -200,16 +199,17 @@ flowchart LR
 ```
 
 ### Langkah Penggabungan & Pelatihan Ulang:
-1. Pindahkan file CSV hasil rekaman dari unduhan browser ke direktori proyek.
-2. Jalankan skrip penggabungan untuk menyatukan dataset kustom dengan dataset asli:
+1. Pindahkan file CSV hasil rekaman dari unduhan browser ke direktori `training/data/`.
+2. Jalankan skrip penggabungan dari dalam folder `training/`:
    ```bash
-   python custom_merge.py landmarks_temp.csv nama_file_kustom_anda.csv
+   cd training
+   python custom_merge.py data/landmarks_temp.csv data/nama_file_kustom_anda.csv
    ```
 3. Hapus model lama dan jalankan pelatihan ulang:
    ```bash
    python train.py
    ```
-   *Catatan*: Jika Anda ingin mengekstrak ulang seluruh dataset mentah di folder `dataset_asl`, hapus berkas `landmarks_temp.csv` terlebih dahulu, lalu jalankan `train.py`.
+   *Catatan*: Jika Anda ingin mengekstrak ulang seluruh dataset mentah di folder `training/dataset_asl`, hapus berkas `landmarks_temp.csv` terlebih dahulu, lalu jalankan `train.py`.
 
 ---
 
@@ -261,20 +261,28 @@ Berikut adalah susunan file utama dalam proyek ini:
 ```
 asl-dump-hibrid/
 │
-├── dataset_asl/            # Direktori berisi folder citra latih per huruf (A-Z, space, dll)
-├── requirements.txt        # Daftar library python yang wajib diinstal
+├── training/               # Folder khusus untuk melatih ulang model (ML/Data Science)
+│   ├── dataset_asl/        # Direktori berisi folder citra latih per huruf (A-Z, space, dll)
+│   ├── data/               # Direktori menyimpan dataset CSV (landmarks_temp.csv, dll)
+│   ├── train.py            # Pipeline ekstraksi fitur, augmentasi data, & pelatihan MLP
+│   └── custom_merge.py     # Alat bantu CLI penggabung CSV data kustom ke dataset utama
 │
-├── main.py                 # Backend API FastAPI, WebSocket Classifier, & Stats Endpoint
-├── train.py                # Pipeline ekstraksi fitur, augmentasi data, & pelatihan MLP
-├── custom_merge.py         # Alat bantu CLI penggabung CSV data kustom ke dataset utama
+├── tools/                  # Halaman statis tambahan
+│   ├── collect_data.html   # Antarmuka perekam data kustom via kamera klien
+│   └── stats.html          # Antarmuka visual Confusion Matrix & real-time tester
 │
+├── docs/                   # Direktori Dokumentasi Proyek
+│   ├── PRD.md              # Product Requirements Document
+│   └── design.md           # Spesifikasi Desain Sistem & Tema
+│
+├── assets/                 # Aset Frontend (CSS, JS, Ikon, Gambar)
+│
+├── main.py                 # Backend API FastAPI, WebSocket Classifier, & Melayani Frontend
 ├── index.html              # Aplikasi antarmuka web utama (Penerjemah, TTS, Flashcard)
-├── collect_data.html       # Antarmuka perekam data kustom via kamera klien
-├── stats.html              # Antarmuka visual Confusion Matrix & real-time tester
-│
+├── Dockerfile              # Konfigurasi container untuk mempermudah deployment
+├── requirements.txt        # Daftar library python yang wajib diinstal
 ├── model_mlp_asl.keras     # Berkas model biner hasil pelatihan
 ├── classes.npy             # Mapping kelas biner NumPy untuk huruf keluaran
-├── landmarks_temp.csv      # Kumpulan data koordinat & fitur terekstrak hasil prapemrosesan
 └── README.md               # Dokumentasi Proyek (Berkas ini)
 ```
 
