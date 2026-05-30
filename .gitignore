@@ -13,11 +13,8 @@ pip-delete-this-directory.txt
 
 # Datasets and Temporary Files
 *.csv
-*.jpg
-*.jpeg
-*.png
 data/raw/
-dataset/
+dataset_asl/
 temp/
 tmp/
 
