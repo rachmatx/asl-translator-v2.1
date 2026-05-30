@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = themeSwitcherHTML.trim();
   const themeNode = tempDiv.firstChild;
+  
+  const footer = document.querySelector('footer');
   if (footer && footer.parentNode) {
     footer.parentNode.insertBefore(themeNode, footer);
   } else {
