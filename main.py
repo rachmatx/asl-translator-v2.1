@@ -131,6 +131,18 @@ app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 async def serve_index():
     return FileResponse("index.html")
 
+@app.get("/index.html", tags=["UI"])
+async def serve_index_explicit():
+    return FileResponse("index.html")
+
+@app.get("/stats.html", tags=["UI"])
+async def serve_stats():
+    return FileResponse("tools/stats.html")
+
+@app.get("/collect_data.html", tags=["UI"])
+async def serve_collect():
+    return FileResponse("tools/collect_data.html")
+
 
 # ── Health Check ─────────────────────────────────────────────────────────────────
 @app.get("/health", tags=["Health"])
