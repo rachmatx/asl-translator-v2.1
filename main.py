@@ -73,7 +73,8 @@ async def lifespan(app: FastAPI):
             "Jalankan train.py terlebih dahulu."
         )
 
-    model   = keras.models.load_model(MODEL_PATH)
+    # compile=False digunakan untuk melewati bug AdamW di Keras 2.15
+    model   = keras.models.load_model(MODEL_PATH, compile=False)
     classes = np.load(CLASSES_PATH, allow_pickle=True)
 
     # Verifikasi dimensi input model vs INPUT_DIM
