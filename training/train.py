@@ -37,7 +37,7 @@ from sklearn.preprocessing import LabelEncoder
 # ── Konfigurasi ─────────────────────────────────────────────────────────────────
 DATASET_DIR    = os.path.join("dataset_asl")
 CSV_TEMP       = "landmarks_temp.csv"
-MODEL_OUT      = "model_mlp_asl.keras"
+MODEL_OUT      = "model_mlp_asl.h5"
 CLASSES_OUT    = "classes.npy"
 MAX_PER_CLASS  = 800
 IMG_EXTENSIONS = (".jpg", ".jpeg", ".png", ".bmp")
