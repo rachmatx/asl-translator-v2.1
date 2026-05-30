@@ -58,12 +58,9 @@ graph TD
     %% Tampilan & Output
     K -->|Render UI| L[Prediksi Huruf & Confidence Bar]
     K -->|Append Word| M[Word Builder]
-```
-
     M -->|Koreksi Kata Levenshtein| N[FastAPI /spellcheck]
     M -->|Ucapkan Kata| O[Web Speech API TTS]
-
-````
+```
 
 ### Alur Komunikasi WebSocket (Sequence Diagram)
 Untuk memastikan respon latensi rendah tanpa batas HTTP *overhead*, komunikasi difasilitasi dengan arsitektur *event-driven* melalui WebSocket:
@@ -97,7 +94,7 @@ sequenceDiagram
     K->>W: Tutup Web/Halaman (onclose)
     W->>S: Disconnect Signal
     S->>S: Hapus Klien & Kosongkan Buffer
-````
+```
 
 ---
 
