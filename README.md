@@ -1,10 +1,11 @@
-# 🤟 Aplikasi Web Penerjemah American Sign Language (ASL) Real-Time (v3)
+# Aplikasi Web Penerjemah American Sign Language (ASL) Real-Time (v2.1)
 
 Aplikasi berbasis web untuk menerjemahkan bahasa isyarat American Sign Language (ASL) ke dalam teks secara real-time. Proyek ini menggunakan **Arsitektur Hibrida** (Frontend ringan + Backend API) yang dioptimalkan untuk perangkat spesifikasi rendah tanpa memerlukan GPU eksternal.
 
 ---
 
-## 📋 Daftar Isi
+## Daftar Isi
+
 1. [Fitur Utama](#-fitur-utama)
 2. [Arsitektur Sistem](#-arsitektur-sistem)
 3. [Spesifikasi Lingkungan & Dependensi](#-spesifikasi-lingkungan--dependensi)
@@ -17,12 +18,12 @@ Aplikasi berbasis web untuk menerjemahkan bahasa isyarat American Sign Language 
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 - **Deteksi Real-Time & Hibrida**: Pemrosesan gambar tangan dilakukan di sisi browser (klien) menggunakan MediaPipe, sementara klasifikasi huruf dilakukan di server via WebSocket untuk latensi sangat rendah (~30-50ms).
-- **Pre-processing 90 Dimensi**: Mengekstrak 63 koordinat landmark tangan, ditambah 15 sudut sendi (*Joint Angles*) dan 12 jarak relatif (*Key Distances*) untuk akurasi tinggi dan ketahanan terhadap rotasi.
+- **Pre-processing 90 Dimensi**: Mengekstrak 63 koordinat landmark tangan, ditambah 15 sudut sendi (_Joint Angles_) dan 12 jarak relatif (_Key Distances_) untuk akurasi tinggi dan ketahanan terhadap rotasi.
 - **Normalisasi Rangka Kanonik (Canonical Frame)**: Koordinat tangan dinormalisasi terhadap posisi, skala, dan rotasi menggunakan algoritma ortogonalisasi Gram-Schmidt di sisi klien.
-- **Temporal Prediction Smoothing**: Prediksi backend menggunakan rata-rata probabilitas bergerak (*sliding window* dari 9 frame terakhir) untuk meminimalisir kedipan (*flickering*).
+- **Temporal Prediction Smoothing**: Prediksi backend menggunakan rata-rata probabilitas bergerak (_sliding window_ dari 9 frame terakhir) untuk meminimalisir kedipan (_flickering_).
 - **Word Builder & Spellcheck**: Pengguna dapat menyusun huruf menjadi kata dengan spasi, backspace, dan fitur koreksi kata otomatis memanfaatkan jarak Levenshtein (`pyspellchecker`).
 - **Text-to-Speech (TTS)**: Tombol suara terintegrasi langsung di web menggunakan Web Speech API untuk mengucapkan kata yang telah dibangun.
 - **Mode Latihan Flashcard**: Fitur gamifikasi latihan bahasa isyarat interaktif dengan sistem skor, streak (beruntun), dan huruf target acak.
@@ -30,7 +31,7 @@ Aplikasi berbasis web untuk menerjemahkan bahasa isyarat American Sign Language 
 
 ---
 
-## 🏗️ Arsitektur Sistem
+## Arsitektur Sistem
 
 Sistem ini membagi beban komputasi secara cerdas antara klien (Frontend) dan server (Backend) untuk mencapai efisiensi maksimal.
 
@@ -58,9 +59,11 @@ graph TD
     K -->|Render UI| L[Prediksi Huruf & Confidence Bar]
     K -->|Append Word| M[Word Builder]
 ```
+
     M -->|Koreksi Kata Levenshtein| N[FastAPI /spellcheck]
     M -->|Ucapkan Kata| O[Web Speech API TTS]
-```
+
+````
 
 ### Alur Komunikasi WebSocket (Sequence Diagram)
 Untuk memastikan respon latensi rendah tanpa batas HTTP *overhead*, komunikasi difasilitasi dengan arsitektur *event-driven* melalui WebSocket:
@@ -94,11 +97,11 @@ sequenceDiagram
     K->>W: Tutup Web/Halaman (onclose)
     W->>S: Disconnect Signal
     S->>S: Hapus Klien & Kosongkan Buffer
-```
+````
 
 ---
 
-## 💻 Spesifikasi Lingkungan & Dependensi
+## Spesifikasi Lingkungan & Dependensi
 
 Agar aplikasi berjalan tanpa konflik, pastikan lingkungan pengembangan Anda memenuhi kriteria berikut:
 
@@ -114,16 +117,20 @@ Agar aplikasi berjalan tanpa konflik, pastikan lingkungan pengembangan Anda meme
 
 ---
 
-## 🚀 Petunjuk Instalasi & Cara Menjalankan
+## Petunjuk Instalasi & Cara Menjalankan
 
 ### 1. Kloning Repositori
+
 Masuk ke direktori kerja proyek Anda:
+
 ```bash
-cd "C:\Users\R\Documents\@Tugas kampus semester 4\Data Sains\asl dump hibrid"
+cd "C:\Users\R\DOwnload\Documents\"
 ```
 
 ### 2. Setup Virtual Environment (Rekomendasi)
+
 Buat dan aktifkan virtual environment agar dependensi terisolasi:
+
 ```powershell
 # Menggunakan PowerShell
 python -m venv venv
@@ -131,26 +138,33 @@ python -m venv venv
 ```
 
 ### 3. Instalasi Dependensi
+
 Lakukan instalasi seluruh library yang dibutuhkan:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Jalankan Server Backend (FastAPI)
+
 Jalankan server menggunakan Uvicorn di localhost dengan port 8000:
+
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
-Server backend akan dimuat, melakukan *warm-up* model TensorFlow, dan siap mendengarkan WebSocket pada `ws://localhost:8000/ws/predict`.
+
+Server backend akan dimuat, melakukan _warm-up_ model TensorFlow, dan siap mendengarkan WebSocket pada `ws://localhost:8000/ws/predict`.
 
 ### 5. Akses Aplikasi Frontend
+
 Karena aplikasi sekarang dilayani langsung oleh FastAPI, Anda tidak perlu membuka file HTML secara terpisah atau menggunakan ekstensi Live Server. Cukup buka browser dan akses:
+
 - **Aplikasi Utama**: Akses `http://localhost:8000` - Halaman utama untuk penerjemah ASL, TTS, dan Flashcard.
 - **Kolektor Data & Analisis**: Buka file HTML di dalam folder `tools/` (seperti `collect_data.html` dan `stats.html`) langsung di browser jika ingin merekam gestur baru atau melihat metrik.
 
 ---
 
-## 📊 Pre-processing & Rekayasa Fitur
+## Pre-processing & Rekayasa Fitur
 
 Untuk menghasilkan model yang ringan namun akurat, koordinat mentah MediaPipe diproses menjadi 90 fitur representatif:
 
@@ -164,17 +178,21 @@ Untuk menghasilkan model yang ringan namun akurat, koordinat mentah MediaPipe di
 ```
 
 ### 1. Normalisasi Posisi & Skala
+
 - **Translasi**: Titik pergelangan tangan (Landmark 0 - Wrist) digunakan sebagai titik asal `(0,0,0)`. Seluruh titik landmark lainnya dikurangi dengan koordinat pergelangan tangan.
-- **Skala**: Seluruh koordinat dibagi dengan jarak Euclidean antara Landmark 0 (Wrist) ke Landmark 9 (Middle Finger MCP). Hal ini membuat deteksi tidak terpengaruh oleh jarak tangan ke kamera (*Scale-Invariant*).
+- **Skala**: Seluruh koordinat dibagi dengan jarak Euclidean antara Landmark 0 (Wrist) ke Landmark 9 (Middle Finger MCP). Hal ini membuat deteksi tidak terpengaruh oleh jarak tangan ke kamera (_Scale-Invariant_).
 
 ### 2. Penyelarasan Rotasi (Gram-Schmidt Canonical Frame)
+
 Rotasi tangan diatasi dengan memproyeksikan seluruh koordinat 3D ke basis ortogonal baru (telapak tangan menghadap ke depan secara standar):
+
 - **Vektor Forward ($u$)**: Arah dari Landmark 0 ke Landmark 9 (Arah vertikal telapak tangan).
 - **Vektor Side ($v$)**: Arah ortogonal telapak tangan ke samping, dibangun dari proyeksi Landmark 17 (Pinky MCP) tegak lurus dengan $u$.
-- **Vektor Normal ($w$)**: Hasil dari perkalian silang (*cross product*) $u \times v$.
-Semua koordinat 3D dikalikan dengan matriks rotasi basis $[u, v, w]^T$ untuk menghasilkan koordinat kanonik.
+- **Vektor Normal ($w$)**: Hasil dari perkalian silang (_cross product_) $u \times v$.
+  Semua koordinat 3D dikalikan dengan matriks rotasi basis $[u, v, w]^T$ untuk menghasilkan koordinat kanonik.
 
 ### 3. Fitur Tambahan (Feature Engineering)
+
 - **15 Sudut Sendi (Angle Features)**: Dihitung pada setiap titik tengah sendi jari dari 15 triplet landmark ($A, B, C$) menggunakan rumus:
   $$\theta = \arccos\left(\frac{\vec{BA} \cdot \vec{BC}}{|\vec{BA}| \times |\vec{BC}|}\right)$$
   Fitur ini sangat stabil terhadap perputaran telapak tangan karena murni mengukur kelenturan jari.
@@ -182,7 +200,7 @@ Semua koordinat 3D dikalikan dengan matriks rotasi basis $[u, v, w]^T$ untuk men
 
 ---
 
-## 🔄 Siklus Koleksi Data Kustom & Pelatihan Ulang
+## Siklus Koleksi Data Kustom & Pelatihan Ulang
 
 Jika model kurang mengenali gestur tangan Anda atau Anda ingin menambahkan kelas gerakan baru, gunakan siklus berikut:
 
@@ -199,6 +217,7 @@ flowchart LR
 ```
 
 ### Langkah Penggabungan & Pelatihan Ulang:
+
 1. Pindahkan file CSV hasil rekaman dari unduhan browser ke direktori `training/data/`.
 2. Jalankan skrip penggabungan dari dalam folder `training/`:
    ```bash
@@ -209,15 +228,16 @@ flowchart LR
    ```bash
    python train.py
    ```
-   *Catatan*: Jika Anda ingin mengekstrak ulang seluruh dataset mentah di folder `training/dataset_asl`, hapus berkas `landmarks_temp.csv` terlebih dahulu, lalu jalankan `train.py`.
+   _Catatan_: Jika Anda ingin mengekstrak ulang seluruh dataset mentah di folder `training/dataset_asl`, hapus berkas `landmarks_temp.csv` terlebih dahulu, lalu jalankan `train.py`.
 
 ---
 
-## 🧠 Detail Model MLP & Pelatihan
+## Detail Model MLP & Pelatihan
 
 Model yang digunakan adalah Multi-Layer Perceptron (MLP) yang sangat efisien namun tangguh.
 
 ### Arsitektur Model:
+
 1. **Input Layer**: 90 Fitur (Landmarks, Sudut, Jarak)
 2. **Dense Layer 1**: 512 Unit + ReLU + Batch Normalization + Dropout (40%)
 3. **Dense Layer 2**: 256 Unit + ReLU + Batch Normalization + Dropout (35%)
@@ -226,6 +246,7 @@ Model yang digunakan adalah Multi-Layer Perceptron (MLP) yang sangat efisien nam
 6. **Output Layer**: 29 Kelas (A-Z, del, space, nothing) + Softmax
 
 ### Strategi Pelatihan (`train.py`):
+
 - **Optimizer**: `AdamW` (Adam dengan weight decay `1e-4` terintegrasi untuk mencegah overfitting).
 - **Label Smoothing**: Menggunakan nilai `0.1` pada fungsi Categorical Crossentropy untuk memperhalus target probabilitas (dari `[0, 1]` menjadi `[0.05, 0.95]`). Ini meningkatkan ketahanan model terhadap kesalahan label data latih.
 - **Callbacks**:
@@ -235,14 +256,14 @@ Model yang digunakan adalah Multi-Layer Perceptron (MLP) yang sangat efisien nam
 
 ---
 
-## 🛠️ Teknik Optimasi Latensi & Akurasi
+## Teknik Optimasi Latensi & Akurasi
 
 Untuk memastikan aplikasi berjalan dengan mulus di perangkat klien dan server tanpa delay, beberapa optimasi khusus diimplementasikan:
 
 1. **Direct TensorFlow Graph Execution (di Backend)**:
-   Di `main.py`, alur inferensi menggunakan pemanggilan fungsi kelas model secara langsung (`model(features)`) ketimbang `model.predict()`. Ini memangkas *overhead* internal TensorFlow untuk ukuran batch 1, **meningkatkan kecepatan inferensi hingga 2x-5x lipat**.
+   Di `main.py`, alur inferensi menggunakan pemanggilan fungsi kelas model secara langsung (`model(features)`) ketimbang `model.predict()`. Ini memangkas _overhead_ internal TensorFlow untuk ukuran batch 1, **meningkatkan kecepatan inferensi hingga 2x-5x lipat**.
 2. **Model Graph Warm-Up**:
-   Saat server FastAPI dimulai (*startup lifespan*), server mengirimkan satu sampel tiruan (zero matrix) ke model untuk menyusun grafik TF. Hal ini mencegah terjadinya latensi tinggi (ngadat) pada frame deteksi pertama ketika klien terhubung.
+   Saat server FastAPI dimulai (_startup lifespan_), server mengirimkan satu sampel tiruan (zero matrix) ke model untuk menyusun grafik TF. Hal ini mencegah terjadinya latensi tinggi (ngadat) pada frame deteksi pertama ketika klien terhubung.
 3. **Temporal Rolling Average (Smoothing)**:
    Untuk mengurangi getaran deteksi akibat noise visual latar belakang, backend menyimpan 9 prediksi probabilitas terakhir dalam antrean `deque` per koneksi WebSocket. Klasifikasi akhir diambil dari rata-rata probabilitas terhalus.
 4. **Data Augmentasi Lanjut**:
@@ -254,7 +275,7 @@ Untuk memastikan aplikasi berjalan dengan mulus di perangkat klien dan server ta
 
 ---
 
-## 📂 Struktur Direktori
+## Struktur Direktori
 
 Berikut adalah susunan file utama dalam proyek ini:
 
@@ -288,4 +309,4 @@ asl-dump-hibrid/
 
 ---
 
-*Catatan Presentasi*: Jalankan server FastAPI terlebih dahulu sebelum membuka halaman HTML mana pun agar koneksi WebSocket berjalan dengan sukses. Pastikan kamera laptop Anda bersih dan memiliki pencahayaan yang cukup untuk deteksi MediaPipe yang optimal.
+_Catatan Presentasi_: Jalankan server FastAPI terlebih dahulu sebelum membuka halaman HTML mana pun agar koneksi WebSocket berjalan dengan sukses. Pastikan kamera laptop Anda bersih dan memiliki pencahayaan yang cukup untuk deteksi MediaPipe yang optimal.
