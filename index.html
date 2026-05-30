@@ -1,0 +1,1404 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASL Real-Time Detector | AI Bahasa Isyarat</title>
+    <meta
+      name="description"
+      content="Deteksi huruf American Sign Language secara real-time menggunakan AI berbasis MediaPipe dan MLP. Terjemahkan bahasa isyarat langsung dari kamera Anda."
+    />
+    <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- MediaPipe Hands via CDN -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <link rel="stylesheet" href="assets/theme.css" />
+    <script src="assets/theme.js"></script>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  </head>
+
+  <body>
+    <div class="app-wrapper">
+
+      <!-- ── Header ─────────────────────────────────────────────────── -->
+      <header>
+        <h1>Detektor Bahasa Isyarat ASL</h1>
+        <p class="subtitle">
+          Deteksi huruf American Sign Language secara langsung dari kamera Anda
+        </p>
+      </header>
+
+      <!-- ── Main Grid ───────────────────────────────────────────────── -->
+      <div class="main-grid">
+        <!-- Left: Camera -->
+        <div class="card camera-card">
+          <div class="camera-header">
+            <div style="display: flex; align-items: center">
+              <button
+                id="btnToggleCamera"
+                class="btn"
+                style="
+                  padding: 6px 12px;
+                  font-size: 12px;
+                  border-radius: 6px;
+                "
+              >
+                Matikan Kamera
+              </button>
+            </div>
+            <div class="status-badge connecting" id="wsStatus">
+              <span id="wsStatusText">● Menghubungkan...</span>
+            </div>
+          </div>
+
+          <div class="video-wrapper">
+            <div class="camera-placeholder" id="cameraPlaceholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" 
+                   viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" 
+                   stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 7 16 12 23 17V7z"/>
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              </svg>
+              <p>Kamera belum aktif</p>
+              <span>Tekan tombol untuk memulai</span>
+            </div>
+            <video id="videoElement" autoplay muted playsinline></video>
+            <canvas id="outputCanvas"></canvas>
+            <canvas id="fxCanvas" style="position: absolute; inset: 0; pointer-events: none; z-index: 10;"></canvas>
+            <div class="fps-badge" id="fpsBadge">-- FPS</div>
+
+            <!-- Overlay prediction -->
+            <div class="prediction-overlay">
+              <div class="overlay-letter idle" id="overlayLetter">?</div>
+              <div class="overlay-confidence">
+                <div class="confidence-bar-container">
+                  <span class="confidence-label">CONFIDENCE</span>
+                  <div class="confidence-track">
+                    <div class="confidence-fill" id="confidenceFill"></div>
+                    <span class="confidence-value" id="confidenceValue">0%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="hand-guide" id="handGuide">
+              <div class="hand-guide-box">
+                <span class="guide-corner tl"></span>
+                <span class="guide-corner tr"></span>
+                <span class="guide-corner bl"></span>
+                <span class="guide-corner br"></span>
+                <p class="guide-text">Tempatkan tangan di sini</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Side Panel -->
+        <div class="side-panel">
+
+
+          <!-- ASL Reference Guide (Visible only in User Mode) -->
+          <div
+            class="card guide-card"
+            id="aslGuideCard"
+            style="display: none; padding: 20px"
+          >
+            <div class="card-label"><span class="material-symbols-outlined">menu_book</span> Panduan Alfabet ASL</div>
+            <div
+              class="guide-image-container"
+              style="
+                width: 90%; margin: 0 auto;
+                padding: 10px;
+                background: #fff;
+                border-radius: var(--radius-sm);
+                border: 1px solid var(--border);
+              "
+            >
+              <img
+                id="aslGuideImage"
+                src="/assets/img/panduan-asl.jpg"
+                alt="Panduan Alfabet ASL"
+                style="
+                  width: 100%;
+                  height: auto;
+                  border-radius: 4px;
+                  display: block;
+                "
+              />
+            </div>
+          </div>
+
+          <!-- Word Builder -->
+          <div class="card word-card" id="wordCard">
+            <div class="card-label"><span class="material-symbols-outlined">edit_note</span> Penyusun Kata</div>
+            <div class="letter-history" id="letterHistory" aria-label="Riwayat huruf terdeteksi"></div>
+            <div class="word-display">
+              <span id="builtWord"></span><span class="cursor-blink"></span>
+            </div>
+            <div class="word-controls">
+              <button class="btn" id="btnSpace" title="Tambah spasi">
+                <span class="material-symbols-outlined">space_bar</span> Spasi
+              </button>
+              <button
+                class="btn"
+                id="btnBackspace"
+                title="Hapus huruf terakhir"
+              >
+                <span class="material-symbols-outlined">backspace</span> Hapus
+              </button>
+              <button class="btn btn-danger" id="btnClear" title="Hapus semua">
+                <span class="material-symbols-outlined">delete</span> Bersihkan
+              </button>
+            </div>
+            <div class="word-controls">
+              <button class="btn btn-tts" id="btnSpeak" title="Ucapkan kata">
+                <span class="material-symbols-outlined">volume_up</span> Ucapkan
+              </button>
+              <button class="btn" id="btnFlashcard" onclick="startFlashcard()">
+                <span class="material-symbols-outlined">style</span> Latihan
+              </button>
+              <button class="btn" id="btnWordChallenge" onclick="startWordChallenge()" title="Main tebak kata">
+                <span class="material-symbols-outlined">extension</span> Tantangan Kata
+              </button>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="card stats-card" id="statsCard">
+            <div class="card-label"><span class="material-symbols-outlined">bar_chart</span> Statistik Sesi</div>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-value" id="statDetections">0</div>
+                <div class="stat-label">Deteksi</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="statFrames">0</div>
+                <div class="stat-label">Frame Terkirim</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="statAvgConf">0%</div>
+                <div class="stat-label">Rata-rata Confidence</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" id="statLatency">—</div>
+                <div class="stat-label">Rata-rata Akurasi</div>
+              </div>
+            </div>
+          </div>
+          <!-- Log -->
+          <div class="card log-card" id="logCard">
+            <div class="card-label"><span class="material-symbols-outlined">terminal</span> Log Sistem</div>
+            <div class="log-scroll" id="logContainer"></div>
+          </div>
+        </div>
+        <!-- /side-panel -->
+      </div>
+      <!-- /main-grid -->
+
+      <footer>
+        Dibangun dengan
+        <span>MediaPipe Hands · TensorFlow MLP · FastAPI WebSocket</span>
+      </footer>
+    </div>
+    <!-- /app-wrapper -->
+
+    <!-- Modal Flashcard -->
+    <div id="flashcardOverlay" class="flashcard-overlay">
+      <!-- Timer Display -->
+      <div class="flashcard-timer"><span class="material-symbols-outlined">timer</span> <span id="flashTimer">60</span>s</div>
+
+      <div style="text-align: center;">
+        <div class="flashcard-label" id="flashTitle">Tunjukkan huruf ini:</div>
+        <div id="flashTarget" class="flashcard-target">A</div>
+        <div id="wordChallengeTarget" class="word-challenge-container" style="display: none;"></div>
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+          <button class="btn" id="btnFlashcardHint" onclick="peekFlashcardHint()" style="font-size: 14px; padding: 8px 16px; flex: 1;">
+            <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility</span> Intip (3s)
+          </button>
+          <button class="btn" id="btnAchievements" onclick="openAchievementsModal()" style="font-size: 14px; padding: 8px 16px; flex: 1;">
+            <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">emoji_events</span> Pencapaian
+          </button>
+        </div>
+      </div>
+
+      <div class="flashcard-pred-wrap">
+        Prediksi saat ini:
+        <span id="flashCurrent" class="flashcard-current">—</span>
+      </div>
+
+      <div id="flashStatus" class="flashcard-status"></div>
+
+      <div class="flashcard-stats-row">
+        <span>Skor: <strong id="flashScore">0</strong></span>
+        <span>Beruntun: <strong id="flashStreak">0</strong><span class="material-symbols-outlined">local_fire_department</span></span>
+        <span>Total: <strong id="flashTotal">0</strong></span>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 8px">
+        <button onclick="nextFlashCard()" class="btn flashcard-btn-skip">
+          <span class="material-symbols-outlined">skip_next</span> Lewati
+        </button>
+        <button
+          onclick="stopFlashcard()"
+          class="btn btn-danger flashcard-btn-stop"
+        >
+          <span class="material-symbols-outlined">close</span> Selesai
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Pencapaian (Achievements) -->
+    <div id="achievementsModal" class="flashcard-overlay" style="display: none; align-items: center; justify-content: center; z-index: 2000;">
+      <div class="achievements-container" style="background: var(--bg-card); padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; border: 2px solid var(--border);">
+        <h2 style="margin-bottom: 15px; font-size: 1.5rem; color: var(--text-1); font-family: var(--font-display);">🏆 Pencapaian</h2>
+        
+        <div class="achievements-grid" style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+          <!-- Speedster -->
+          <div id="badge-speedster" class="badge-item badge-locked">
+            <div class="badge-icon"><span class="material-symbols-outlined">bolt</span></div>
+            <div class="badge-info">
+              <div class="badge-title">Speedster</div>
+              <div class="badge-desc">Berhasil mengeja 1 kata dalam 3 detik.</div>
+            </div>
+          </div>
+          
+          <!-- Marathon -->
+          <div id="badge-marathon" class="badge-item badge-locked">
+            <div class="badge-icon"><span class="material-symbols-outlined">directions_run</span></div>
+            <div class="badge-info">
+              <div class="badge-title">Marathon</div>
+              <div class="badge-desc">Melakukan 50 tebakan benar di mode Latihan.</div>
+            </div>
+          </div>
+
+          <!-- Scholar -->
+          <div id="badge-scholar" class="badge-item badge-locked">
+            <div class="badge-icon"><span class="material-symbols-outlined">school</span></div>
+            <div class="badge-info">
+              <div class="badge-title">Scholar</div>
+              <div class="badge-desc">Menggunakan aplikasi 3 hari berturut-turut.</div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="btn btn-danger" style="margin-top: 25px; width: 100%;" onclick="closeAchievementsModal()">Tutup</button>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="toast-notification">
+      <div class="toast-icon">🏆</div>
+      <div class="toast-content">
+        <div class="toast-title">Pencapaian Terbuka!</div>
+        <div id="toastDesc" class="toast-desc">Speedster</div>
+      </div>
+    </div>
+
+    <!-- ── Hidden video element used by MediaPipe Camera utility ─────── -->
+    <video
+      id="inputVideoHidden"
+      style="display: none"
+      autoplay
+      muted
+      playsinline
+    ></video>
+
+    <script>
+      // ═══════════════════════════════════════════════════════════════════
+      //  DOM ELEMENTS
+      // ═══════════════════════════════════════════════════════════════════
+      const videoElement = document.getElementById("videoElement");
+      const canvasElement = document.getElementById("outputCanvas");
+      const canvasCtx = canvasElement.getContext("2d");
+
+      function setCameraActive(isActive) {
+        const placeholder = document.getElementById('cameraPlaceholder');
+        if (placeholder) {
+          placeholder.style.display = isActive ? 'none' : 'flex';
+        }
+      }
+      videoElement.addEventListener('playing', () => setCameraActive(true));
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  CONFIG
+      // ═══════════════════════════════════════════════════════════════════
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const WS_URL = `${protocol}//${window.location.host}/ws/predict`;
+      const CONFIDENCE_THRESHOLD = 0.5; // diturunkan agar lebih peka
+      const SEND_INTERVAL_MS = 40; // dikurangi jadi 40ms (25 FPS) agar lebih responsif
+      const HOLD_FRAMES = 20; // dinaikkan jadi 20 frame (sekitar 0.8 detik) agar ada jeda wajar
+      const AUTO_APPEND_WORD = true; // aktifkan word builder otomatis
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  STATE
+      // ═══════════════════════════════════════════════════════════════════
+      let ws = null;
+      let lastSendTime = 0;
+      let currentLandmarks = null; // array 63 angka dari MediaPipe
+
+      let currentPrediction = null;
+      let predictionHoldCount = 0;
+      let lastAppendedLetter = null;
+
+      let totalDetections = 0;
+      let totalFramesSent = 0;
+      let confidenceSum = 0;
+      let confidenceCount = 0;
+      let builtWord = "";
+
+      let fpsFrameCount = 0;
+      let fpsLastTime = performance.now();
+      let currentFPS = 0;
+
+      // ── Landmark Stability Filter ────────────────────────────────────────────────
+      // Mencegah frame "jittery" (landmark loncat tiba-tiba) dari background berantakan
+      // dikirim ke model, sehingga prediksi lebih stabil.
+      const JITTER_THRESHOLD = 0.3; // max perubahan rata-rata koordinat antar frame
+      const STABILITY_FRAMES = 2; // minimal frame stabil berturut sebelum data valid
+      let prevLandmarkCoords = null; // coords 63-float dari frame sebelumnya
+      let stableFrameCount = 0; // counter frame stabil berturut-turut
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  LOGGING
+      // ═══════════════════════════════════════════════════════════════════
+      function log(msg, type = "info") {
+        const container = document.getElementById("logContainer");
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+
+        const now = new Date();
+        const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+
+        entry.innerHTML = `
+    <span class="log-time">${timeStr}</span>
+    <span class="log-msg ${type}">${msg}</span>
+  `;
+        container.prepend(entry);
+        // Batasi 50 entry
+        while (container.children.length > 50)
+          container.removeChild(container.lastChild);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  WEBSOCKET
+      // ═══════════════════════════════════════════════════════════════════
+      function updateWsStatus(state) {
+        const pill = document.getElementById("wsStatus");
+        const label = document.getElementById("wsStatusText");
+        pill.className = `status-badge ${state}`;
+        const labels = {
+          connected: "● Terhubung",
+          error: "● Terputus",
+          connecting: "● Menghubungkan...",
+        };
+        label.textContent = labels[state] || state;
+      }
+
+      function connectWebSocket() {
+        updateWsStatus("connecting");
+        log("Mencoba koneksi WebSocket…", "info");
+
+        ws = new WebSocket(WS_URL);
+
+        ws.onopen = () => {
+          updateWsStatus("connected");
+          log("WebSocket terhubung ke server!", "success");
+        };
+
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          handlePrediction(data);
+        };
+
+        ws.onerror = () => {
+          log("WebSocket error. Pastikan server berjalan.", "error");
+        };
+
+        ws.onclose = () => {
+          updateWsStatus("error");
+          log("WebSocket terputus. Mencoba ulang dalam 3 detik…", "warn");
+          setTimeout(connectWebSocket, 3000);
+        };
+      }
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  PREDICTION HANDLER
+      // ═══════════════════════════════════════════════════════════════════
+      function handlePrediction(data) {
+        const overlayLetter = document.getElementById("overlayLetter");
+
+        if (data.error) {
+          log(`Error: ${data.error}`, "error");
+          return;
+        }
+
+        const confidence = data.confidence ?? 0;
+        const prediction = data.prediction; // null jika confidence rendah
+        const confPct = Math.round(confidence * 100);
+
+        // Update confidence bar
+        const pct = Math.round(confidence * 100);
+        document.getElementById('confidenceFill').style.width = pct + '%';
+        document.getElementById('confidenceValue').textContent = pct + '%';
+
+        if (prediction) {
+          // ── Deteksi berhasil ────────────────────────────────────────
+          if (overlayLetter) {
+            overlayLetter.textContent = prediction;
+            overlayLetter.className = "overlay-letter detected";
+          }
+
+          totalDetections++;
+          confidenceSum += confidence;
+          confidenceCount++;
+
+          // Word builder: tahan huruf sebelum append
+          if (AUTO_APPEND_WORD) {
+            if (prediction === currentPrediction) {
+              predictionHoldCount++;
+              if (
+                predictionHoldCount === HOLD_FRAMES &&
+                prediction !== lastAppendedLetter
+              ) {
+                if (prediction === "space") {
+                  triggerAutocorrect();
+                } else if (prediction === "del") {
+                  builtWord = builtWord.slice(0, -1);
+                } else if (prediction !== "nothing") {
+                  builtWord += prediction.toUpperCase();
+                }
+                // Add chip for visual history (skip 'nothing')
+                if (prediction !== 'nothing') {
+                  appendLetterChip(prediction);
+                }
+                lastAppendedLetter = prediction;
+                updateWordDisplay();
+              }
+            } else {
+              currentPrediction = prediction;
+              predictionHoldCount = 1;
+            }
+          }
+
+          // Flashcard & Word Challenge logic
+          if ((flashActive || wordChallengeActive) && prediction && !flashCooldown) {
+            document.getElementById("flashCurrent").textContent = prediction;
+            
+            // Mode Tantangan Kata
+            if (wordChallengeActive) {
+              const targetLetter = challengeWord[challengeIndex];
+              if (prediction === targetLetter) {
+                flashCorrectFrames++;
+                flashWrongFrames = 0;
+                if (flashCorrectFrames >= WORD_CHALLENGE_FRAMES) {
+                  playSFX("success");
+                  spawnParticles(lastHandX, lastHandY, 15, "#00e676");
+                  
+                  // Update UI
+                  const letterSpans = document.getElementById("wordChallengeTarget").children;
+                  letterSpans[challengeIndex].className = "challenge-letter done";
+                  
+                  challengeIndex++;
+                  flashCorrectFrames = 0;
+                  flashScore++;
+                  flashTotal++;
+                  flashStreak++;
+                  document.getElementById("flashScore").textContent = flashScore;
+                  document.getElementById("flashStreak").textContent = flashStreak;
+                  document.getElementById("flashTotal").textContent = flashTotal;
+                  
+                  // Kata Selesai?
+                  if (challengeIndex >= challengeWord.length) {
+                    const timeTaken = Date.now() - wordStartTime;
+                    if (timeTaken <= 3000) {
+                      unlockAchievement('speedster');
+                    }
+                    
+                    playSFX("success"); // double sound
+                    spawnParticles(lastHandX, lastHandY, 50, "#ff6b9d");
+                    flashCooldown = true;
+                    document.getElementById("flashStatus").innerHTML =
+                      '<span class="material-symbols-outlined" style="vertical-align: bottom;">celebration</span> Hebat!';
+                    
+                    setTimeout(nextWordChallenge, 1500);
+                    setTimeout(() => { flashCooldown = false; }, 2000);
+                  } else {
+                    // Lanjut huruf berikutnya
+                    letterSpans[challengeIndex].className = "challenge-letter active";
+                    flashCooldown = true;
+                    setTimeout(() => { flashCooldown = false; }, 500);
+                  }
+                }
+              } else {
+                flashCorrectFrames = 0;
+                flashWrongFrames++;
+                if (flashWrongFrames > 20) {
+                  flashStreak = 0;
+                  document.getElementById("flashStreak").textContent = "0";
+                }
+              }
+            } 
+            // Mode Flashcard Huruf Biasa
+            else if (flashActive) {
+              if (prediction === flashTarget) {
+                flashCorrectFrames++;
+                flashWrongFrames = 0;
+                if (flashCorrectFrames >= FLASH_CORRECT_FRAMES) {
+                  playSFX("success");
+                  spawnParticles(lastHandX, lastHandY, 20, "#00d4ff");
+                  flashScore++;
+                  flashStreak++;
+                  flashTotal++;
+                  
+                  // Marathon Tracking
+                  let totalCorrect = parseInt(localStorage.getItem("asl_marathon_count") || "0") + 1;
+                  localStorage.setItem("asl_marathon_count", totalCorrect);
+                  if (totalCorrect >= 50) {
+                    unlockAchievement('marathon');
+                  }
+                  
+                  document.getElementById("flashStatus").innerHTML =
+                    '<span class="material-symbols-outlined" style="vertical-align: bottom;">check_circle</span> Benar!';
+                  document.getElementById("flashScore").textContent = flashScore;
+                  document.getElementById("flashStreak").textContent =
+                    flashStreak;
+                  document.getElementById("flashTotal").textContent = flashTotal;
+                  
+                  flashCooldown = true;
+                  setTimeout(nextFlashCard, 800);
+                  setTimeout(() => {
+                    flashCooldown = false;
+                  }, 1500);
+                  flashCorrectFrames = 0;
+                }
+              } else {
+                flashCorrectFrames = 0;
+                flashWrongFrames++;
+                if (flashWrongFrames > 20) {
+                  flashStreak = 0;
+                  document.getElementById("flashStreak").textContent = "0";
+                }
+              }
+            }
+          }
+        } else {
+          // ── Confidence rendah ────────────────────────────────────────
+          if (overlayLetter) {
+            overlayLetter.textContent = "?";
+            overlayLetter.className = "overlay-letter idle";
+          }
+          document.getElementById('confidenceValue').textContent = confPct + '%';
+          currentPrediction = null;
+          predictionHoldCount = 0;
+        }
+
+        // Update stats
+        document.getElementById("statDetections").textContent = totalDetections;
+        document.getElementById("statAvgConf").textContent = confidenceCount
+          ? Math.round((confidenceSum / confidenceCount) * 100) + "%"
+          : "0%";
+      }
+
+      function updateWordDisplay() {
+        document.getElementById("builtWord").textContent = builtWord;
+      }
+
+      function appendLetterChip(letter) {
+        const container = document.getElementById('letterHistory');
+        if (!container) return;
+
+        const chip = document.createElement('span');
+        const isSpace = (letter === 'space' || letter === ' ');
+        chip.className = 'letter-chip' + (isSpace ? ' is-space' : '');
+        chip.textContent = isSpace ? '⎵' : letter.toUpperCase();
+        chip.title = isSpace ? 'Spasi' : letter.toUpperCase();
+
+        container.appendChild(chip);
+
+        // Cap at 20 chips to prevent DOM bloat
+        while (container.children.length > 20) {
+          container.removeChild(container.firstChild);
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  AUTOCORRECT & WORD CONTROLS
+      // ═══════════════════════════════════════════════════════════════════
+      async function triggerAutocorrect() {
+        const words = builtWord.trim().split(" ");
+        const lastWord = words[words.length - 1];
+
+        if (!lastWord) {
+          builtWord += " ";
+          updateWordDisplay();
+          return;
+        }
+
+        try {
+          const res = await fetch(`/spellcheck?word=${lastWord}`);
+          const data = await res.json();
+
+          if (data.corrected && data.corrected !== lastWord.toUpperCase()) {
+            log(`Autocorrect: ${lastWord} ➔ ${data.corrected}`, "success");
+            words[words.length - 1] = data.corrected;
+          }
+        } catch (err) {
+          console.error("Autocorrect error:", err);
+        }
+
+        builtWord = words.join(" ") + " ";
+        updateWordDisplay();
+      }
+      document.getElementById("btnSpace").addEventListener("click", () => {
+        triggerAutocorrect();
+        log("Spasi ditambahkan secara manual", "info");
+      });
+
+      document.getElementById("btnBackspace").addEventListener("click", () => {
+        builtWord = builtWord.slice(0, -1);
+        updateWordDisplay();
+        log("Karakter terakhir dihapus", "info");
+      });
+
+      document.getElementById("btnClear").addEventListener("click", () => {
+        builtWord = "";
+        updateWordDisplay();
+        const hist = document.getElementById('letterHistory');
+        if (hist) hist.innerHTML = '';
+        log("Kata dikosongkan", "warn");
+      });
+
+      // ── Text-to-Speech ─────────────────────────────────────────────────────
+      const synth = window.speechSynthesis;
+
+      document.getElementById("btnSpeak").addEventListener("click", () => {
+        if (!builtWord.trim()) return;
+        synth.cancel(); // hentikan yang sedang berjalan
+        const utterance = new SpeechSynthesisUtterance(builtWord.trim());
+        utterance.lang = "en-US";
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        const btnSpeak = document.getElementById("btnSpeak");
+        utterance.onstart = () => {
+          log("TTS: memulai ucapan...", "info");
+          btnSpeak.classList.add("speaking");
+        };
+        utterance.onend = () => {
+          log("TTS: selesai", "success");
+          btnSpeak.classList.remove("speaking");
+        };
+        synth.speak(utterance);
+        log(`TTS: "${builtWord.trim()}"`, "info");
+      });
+
+      // ── Audio SFX ───────────────────────────────────────────────────────────
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      function playSFX(type) {
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === "success") {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(
+            1046.5,
+            audioCtx.currentTime + 0.1,
+          ); // C6
+          gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioCtx.currentTime + 0.3,
+          );
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        } else if (type === "end") {
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(
+            110,
+            audioCtx.currentTime + 0.5,
+          );
+          gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioCtx.currentTime + 0.5,
+          );
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.5);
+        }
+      }
+
+      // ── Particle FX ─────────────────────────────────────────────────────────
+      const fxCanvas = document.getElementById("fxCanvas");
+      const fxCtx = fxCanvas.getContext("2d");
+      let particles = [];
+      let lastHandX = window.innerWidth / 2;
+      let lastHandY = window.innerHeight / 2;
+      
+      function resizeFxCanvas() {
+        if (fxCanvas) {
+          fxCanvas.width = fxCanvas.clientWidth || 640;
+          fxCanvas.height = fxCanvas.clientHeight || 480;
+        }
+      }
+      window.addEventListener('resize', resizeFxCanvas);
+      setTimeout(resizeFxCanvas, 1000);
+
+      function spawnParticles(x, y, count = 20, primaryColor = "#00d4ff") {
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 12,
+            vy: (Math.random() - 0.5) * 12 - 3,
+            life: 1.0,
+            color: Math.random() > 0.5 ? primaryColor : "#6c63ff",
+            size: Math.random() * 6 + 3
+          });
+        }
+      }
+
+      function updateParticles() {
+        fxCtx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          let p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.2; // gravity
+          p.life -= 0.02;
+          
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+          
+          fxCtx.globalAlpha = p.life;
+          fxCtx.fillStyle = p.color;
+          fxCtx.beginPath();
+          fxCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          fxCtx.fill();
+        }
+        fxCtx.globalAlpha = 1.0;
+        requestAnimationFrame(updateParticles);
+      }
+      updateParticles();
+
+      // ── Flashcard & Word Challenge Logic ────────────────────────────────────
+      const ASL_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+      const WORD_LIST = ["HELLO", "WORLD", "APPLE", "SIGN", "CODE", "PEACE", "WATER", "BLUE", "HAPPY", "NICE", "MEET", "GOOD", "LOVE", "LEARN", "DEAF"];
+      
+      let flashActive = false;
+      let wordChallengeActive = false;
+      
+      let flashTarget = null;
+      let challengeWord = "";
+      let challengeIndex = 0;
+      
+      let flashScore = 0, flashStreak = 0, flashTotal = 0;
+      let flashCorrectFrames = 0;
+      let flashWrongFrames = 0;
+      const FLASH_CORRECT_FRAMES = 10; 
+      const WORD_CHALLENGE_FRAMES = 5; // Lebih mudah agar tidak lambat mengeja
+      let flashCooldown = false;
+
+      let flashTimerInterval = null;
+      let flashTimeLeft = 60;
+
+      function startFlashcard() {
+        flashActive = true;
+        wordChallengeActive = false;
+        flashTimeLeft = 60;
+        flashScore = flashStreak = flashTotal = flashCorrectFrames = flashWrongFrames = 0;
+
+        document.getElementById("flashcardOverlay").style.display = "flex";
+        document.getElementById("flashTitle").textContent = "Tunjukkan huruf ini:";
+        document.getElementById("flashTarget").style.display = "block";
+        document.getElementById("wordChallengeTarget").style.display = "none";
+        document.getElementById("btnFlashcardHint").style.display = "inline-block";
+        
+        document.getElementById("flashScore").textContent = "0";
+        document.getElementById("flashStreak").textContent = "0";
+        document.getElementById("flashTotal").textContent = "0";
+        document.getElementById("flashTimer").textContent = flashTimeLeft;
+
+        // Start countdown
+        clearInterval(flashTimerInterval);
+        flashTimerInterval = setInterval(() => {
+          flashTimeLeft--;
+          document.getElementById("flashTimer").textContent = flashTimeLeft;
+          if (flashTimeLeft <= 0) {
+            stopFlashcard(true); // stop due to timeout
+          }
+        }, 1000);
+
+        nextFlashCard();
+        log("Mode Latihan dimulai!", "success");
+      }
+      
+      function startWordChallenge() {
+        wordChallengeActive = true;
+        flashActive = false;
+        flashTimeLeft = 90; // Waktu lebih lama untuk kata
+        flashScore = flashStreak = flashTotal = flashCorrectFrames = flashWrongFrames = 0;
+        
+        document.getElementById("flashcardOverlay").style.display = "flex";
+        document.getElementById("flashTitle").textContent = "Eja kata ini:";
+        document.getElementById("flashTarget").style.display = "none";
+        document.getElementById("wordChallengeTarget").style.display = "flex";
+        document.getElementById("btnFlashcardHint").style.display = "none"; // Sembunyikan untuk Tantangan Kata
+        
+        document.getElementById("flashScore").textContent = "0";
+        document.getElementById("flashStreak").textContent = "0";
+        document.getElementById("flashTotal").textContent = "0";
+        document.getElementById("flashTimer").textContent = flashTimeLeft;
+
+        clearInterval(flashTimerInterval);
+        flashTimerInterval = setInterval(() => {
+          flashTimeLeft--;
+          document.getElementById("flashTimer").textContent = flashTimeLeft;
+          if (flashTimeLeft <= 0) {
+            stopFlashcard(true); 
+          }
+        }, 1000);
+
+        nextWordChallenge();
+        log("Tantangan Kata dimulai!", "success");
+      }
+
+      function stopFlashcard(isTimeout = false) {
+        flashActive = false;
+        wordChallengeActive = false;
+        clearInterval(flashTimerInterval);
+
+        if (isTimeout) {
+          playSFX("end");
+          alert(
+            `Waktu Habis! Skor Akhir Anda: ${flashScore} / ${flashTotal}\nBeruntun Tertinggi: ${flashStreak}`,
+          );
+        }
+
+        document.getElementById("flashcardOverlay").style.display = "none";
+        log(`Mode Latihan selesai. Skor: ${flashScore}/${flashTotal}`, "info");
+      }
+
+      function nextFlashCard() {
+        flashTarget = ASL_LETTERS[Math.floor(Math.random() * ASL_LETTERS.length)];
+        document.getElementById("flashTarget").textContent = flashTarget;
+        document.getElementById("flashStatus").textContent = "";
+        document.getElementById("flashCurrent").textContent = "—";
+        flashCorrectFrames = 0;
+        flashWrongFrames = 0;
+      }
+      
+      function peekFlashcardHint() {
+        const overlay = document.getElementById("flashcardOverlay");
+        const btn = document.getElementById("btnFlashcardHint");
+        overlay.classList.add("peek-mode");
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility_off</span> Mengintip...';
+        
+        setTimeout(() => {
+          overlay.classList.remove("peek-mode");
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility</span> Intip Panduan (3s)';
+        }, 3000);
+      }
+      
+      // ── Gamification (Achievements) Logic ───────────────────────────────────
+      const ACHIEVEMENTS = {
+        speedster: { id: "speedster", name: "Speedster", desc: "Berhasil mengeja 1 kata dalam 3 detik." },
+        marathon: { id: "marathon", name: "Marathon", desc: "Melakukan 50 tebakan benar di mode Latihan." },
+        scholar: { id: "scholar", name: "Scholar", desc: "Menggunakan aplikasi 3 hari berturut-turut." }
+      };
+
+      function getUnlockedAchievements() {
+        return JSON.parse(localStorage.getItem("asl_achievements") || "[]");
+      }
+
+      function unlockAchievement(id) {
+        const unlocked = getUnlockedAchievements();
+        if (!unlocked.includes(id)) {
+          unlocked.push(id);
+          localStorage.setItem("asl_achievements", JSON.stringify(unlocked));
+          
+          // Show Toast
+          const toast = document.getElementById("toastNotification");
+          document.getElementById("toastDesc").textContent = ACHIEVEMENTS[id].name;
+          toast.classList.add("show");
+          playSFX("success");
+          spawnParticles(window.innerWidth / 2, window.innerHeight - 100, 40, "#FFD700");
+          
+          setTimeout(() => {
+            toast.classList.remove("show");
+          }, 4000);
+          
+          updateAchievementsUI();
+        }
+      }
+
+      function updateAchievementsUI() {
+        const unlocked = getUnlockedAchievements();
+        for (const key in ACHIEVEMENTS) {
+          const el = document.getElementById("badge-" + key);
+          if (el) {
+            if (unlocked.includes(key)) {
+              el.className = "badge-item badge-unlocked";
+              const iconBox = el.querySelector('.badge-icon');
+              // Ganti ikon menjadi piala/bintang saat terbuka
+              iconBox.innerHTML = '<span class="material-symbols-outlined">workspace_premium</span>';
+            } else {
+              el.className = "badge-item badge-locked";
+            }
+          }
+        }
+      }
+
+      function openAchievementsModal() {
+        updateAchievementsUI();
+        document.getElementById("achievementsModal").style.display = "flex";
+      }
+      function closeAchievementsModal() {
+        document.getElementById("achievementsModal").style.display = "none";
+      }
+
+      function checkScholar() {
+        const today = new Date().toDateString();
+        let lastVisit = localStorage.getItem("asl_last_visit");
+        let streak = parseInt(localStorage.getItem("asl_day_streak") || "0");
+        
+        if (lastVisit) {
+          if (lastVisit !== today) {
+            const lastDate = new Date(lastVisit);
+            const currDate = new Date(today);
+            const diffDays = Math.round(Math.abs((currDate - lastDate) / (1000 * 60 * 60 * 24))); 
+            
+            if (diffDays === 1) {
+              streak += 1;
+            } else if (diffDays > 1) {
+              streak = 1; 
+            }
+          }
+        } else {
+          streak = 1;
+        }
+        
+        localStorage.setItem("asl_last_visit", today);
+        localStorage.setItem("asl_day_streak", streak);
+        
+        if (streak >= 3) {
+          unlockAchievement('scholar');
+        }
+      }
+      // Panggil saat aplikasi dimuat
+      setTimeout(checkScholar, 2000);
+
+      
+      let wordStartTime = 0;
+      function nextWordChallenge() {
+        challengeWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
+        challengeIndex = 0;
+        wordStartTime = Date.now();
+        
+        const container = document.getElementById("wordChallengeTarget");
+        container.innerHTML = "";
+        
+        for (let i = 0; i < challengeWord.length; i++) {
+          const span = document.createElement("span");
+          span.textContent = challengeWord[i];
+          span.className = i === 0 ? "challenge-letter active" : "challenge-letter";
+          container.appendChild(span);
+        }
+        
+        document.getElementById("flashStatus").textContent = "";
+        document.getElementById("flashCurrent").textContent = "—";
+        flashCorrectFrames = 0;
+        flashWrongFrames = 0;
+      }
+
+      // ── Angle Features — IDENTIK dengan ANGLE_TRIPLETS di train.py ────────────────
+      const ANGLE_TRIPLETS = [
+        [0, 1, 2],
+        [1, 2, 3],
+        [2, 3, 4], // ibu jari
+        [0, 5, 6],
+        [5, 6, 7],
+        [6, 7, 8], // telunjuk
+        [0, 9, 10],
+        [9, 10, 11],
+        [10, 11, 12], // tengah
+        [0, 13, 14],
+        [13, 14, 15],
+        [14, 15, 16], // manis
+        [0, 17, 18],
+        [17, 18, 19],
+        [18, 19, 20], // kelingking
+      ];
+
+      // ── Distance Pairs — IDENTIK dengan DIST_PAIRS di train.py ───────────────────
+      const DIST_PAIRS = [
+        [4, 8],
+        [4, 12],
+        [4, 16],
+        [4, 20], // jempol ke ujung jari lain
+        [8, 12],
+        [12, 16],
+        [16, 20], // antar ujung jari berdekatan
+        [4, 0],
+        [8, 0],
+        [12, 0],
+        [16, 0],
+        [20, 0], // ujung jari ke wrist
+      ];
+
+      /**
+       * Menghitung 15 sudut sendi dari array 21 objek {x,y,z}.
+       * Sudut di titik B: acos( dot(B->A, B->C) / (|B->A| * |B->C|) )
+       * Hasil: rotation-invariant & scale-invariant (sama dengan versi Python).
+       */
+      function computeAngleFeatures(pts) {
+        function vecAngle(ai, bi, ci) {
+          const v1x = pts[ai].x - pts[bi].x,
+            v1y = pts[ai].y - pts[bi].y,
+            v1z = pts[ai].z - pts[bi].z;
+          const v2x = pts[ci].x - pts[bi].x,
+            v2y = pts[ci].y - pts[bi].y,
+            v2z = pts[ci].z - pts[bi].z;
+          const dot = v1x * v2x + v1y * v2y + v1z * v2z;
+          const mag1 = Math.sqrt(v1x ** 2 + v1y ** 2 + v1z ** 2) + 1e-8;
+          const mag2 = Math.sqrt(v2x ** 2 + v2y ** 2 + v2z ** 2) + 1e-8;
+          return Math.acos(Math.max(-1.0, Math.min(1.0, dot / (mag1 * mag2))));
+        }
+        return ANGLE_TRIPLETS.map(([a, b, c]) => vecAngle(a, b, c));
+      }
+
+      /**
+       * Menghitung 12 jarak Euclidean antar pasang titik.
+       * Input: coords (array 63 float: [x0,y0,z0, x1,y1,z1, ...])
+       * Output: array 12 float — IDENTIK dengan compute_distance_features() Python.
+       */
+      function computeDistanceFeatures(coords) {
+        // Rekonstruksi 21 titik dari array flat
+        const pts = [];
+        for (let i = 0; i < 63; i += 3) {
+          pts.push({ x: coords[i], y: coords[i + 1], z: coords[i + 2] });
+        }
+        return DIST_PAIRS.map(([a, b]) => {
+          const dx = pts[a].x - pts[b].x;
+          const dy = pts[a].y - pts[b].y;
+          const dz = pts[a].z - pts[b].z;
+          return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        });
+      }
+
+      /**
+       * Normalisasi rotasi ke "frame kanonik" — IDENTIK dengan align_rotation() Python.
+       * Input : array 21 {x,y,z} yang sudah ditranslasi ke wrist=0.
+       * Output: array 21 {x,y,z} setelah diputar ke frame kanonik.
+       *
+       * Metode Gram-Schmidt:
+       *   u = unit vector wrist→middle_MCP (lm9)
+       *   v = unit vector dari proyeksi ortogonal wrist→pinky_MCP (lm17) terhadap u
+       *   w = cross product u × v
+       */
+      function alignRotation(pts) {
+        // Vektor primer: wrist (lm0=origin) → index MCP (lm5)
+        const mag_f =
+          Math.sqrt(pts[5].x ** 2 + pts[5].y ** 2 + pts[5].z ** 2) + 1e-8;
+        const ux = pts[5].x / mag_f,
+          uy = pts[5].y / mag_f,
+          uz = pts[5].z / mag_f;
+
+        // Gram-Schmidt: ortogonalkan wrist → pinky MCP (lm17) terhadap u
+        const dot_su = pts[17].x * ux + pts[17].y * uy + pts[17].z * uz;
+        const rx = pts[17].x - dot_su * ux;
+        const ry = pts[17].y - dot_su * uy;
+        const rz = pts[17].z - dot_su * uz;
+        const mag_r = Math.sqrt(rx * rx + ry * ry + rz * rz) + 1e-8;
+        const vx = rx / mag_r,
+          vy = ry / mag_r,
+          vz = rz / mag_r;
+
+        // Cross product u × v
+        const wx = uy * vz - uz * vy;
+        const wy = uz * vx - ux * vz;
+        const wz = ux * vy - uy * vx;
+
+        // Putar semua titik ke basis kanonik
+        return pts.map((p) => ({
+          x: p.x * ux + p.y * uy + p.z * uz,
+          y: p.x * vx + p.y * vy + p.z * vz,
+          z: p.x * wx + p.y * wy + p.z * wz,
+        }));
+      }
+
+      function onResults(results) {
+        // FPS counter
+        fpsFrameCount++;
+        const now = performance.now();
+        if (now - fpsLastTime >= 1000) {
+          currentFPS = fpsFrameCount;
+          fpsFrameCount = 0;
+          fpsLastTime = now;
+          document.getElementById("fpsBadge").textContent = `${currentFPS} FPS`;
+        }
+
+        // Resize canvas ke ukuran video
+        canvasElement.width = results.image.width;
+        canvasElement.height = results.image.height;
+
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+        // Gambar frame video ke canvas agar skeleton tidak melayang tanpa background (opsional, tapi disarankan)
+        // canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+        if (
+          results.multiHandLandmarks &&
+          results.multiHandLandmarks.length > 0
+        ) {
+          const landmarks = results.multiHandLandmarks[0];
+
+          // Gambar koneksi & titik tangan
+          drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+            color: "rgba(108,99,255,0.7)",
+            lineWidth: 2,
+          });
+          drawLandmarks(canvasCtx, landmarks, {
+            color: "#00d4ff",
+            fillColor: "rgba(0,212,255,0.3)",
+            lineWidth: 1,
+            radius: 4,
+          });
+
+          // ── Pipeline Normalisasi 3 Langkah (SINKRON dengan train.py) ────────────────
+
+          // Langkah 1: Fix Aspect Ratio & Translasi (Pusatkan di wrist)
+          const aspect = canvasElement.height / canvasElement.width;
+          const base_x = landmarks[0].x;
+          const base_y = landmarks[0].y * aspect;
+          const base_z = landmarks[0].z;
+
+          // Langkah 1.5: Chirality — normalisasi arah tangan agar cocok dengan dataset.
+          // Di proyek ini, kamera menggunakan unmirrored mode (selfieMode: false).
+          // Tangan kiri fisik berlabel "Left", memiliki geometri tangan kiri.
+          // Kita mengubah tangan kiri fisik menjadi geometri tangan kanan SEBELUM alignRotation
+          // agar semua tangan konsisten dengan "Canonical Right Hand" yang menjadi dataset utama.
+          let isLeftHand = false;
+          if (results.multiHandedness && results.multiHandedness.length > 0) {
+            isLeftHand = results.multiHandedness[0].label === "Left";
+          }
+
+          const translated = landmarks.map((lm) => {
+            let dx = lm.x - base_x;
+            if (isLeftHand) {
+              dx = -dx; // Jadikan geometri tangan kanan SEBELUM rotasi agar sumbu Z benar (u x v)
+            }
+            return {
+              x: dx,
+              y: lm.y * aspect - base_y,
+              z: lm.z - base_z,
+            };
+          });
+
+          // Langkah 2: Normalisasi Skala — bagi dengan jarak wrist ke Middle MCP (lm[9])
+          const ref_dist = Math.sqrt(
+            translated[9].x ** 2 + translated[9].y ** 2 + translated[9].z ** 2,
+          );
+
+          if (ref_dist < 1e-6) {
+            currentLandmarks = null;
+          } else {
+            // Langkah 2b: Normalisasi Rotasi (Canonical Frame)
+            const rotated = alignRotation(translated);
+
+            // Hitung ulang ref_dist dari rotated[9]
+            const ref_dist2 = Math.sqrt(
+              rotated[9].x ** 2 + rotated[9].y ** 2 + rotated[9].z ** 2,
+            );
+            const scale = ref_dist2 < 1e-6 ? ref_dist : ref_dist2;
+
+            const coords = [];
+            for (const pt of rotated) {
+              // Hapus coords_flipped! Gunakan `features` murni.
+              // Karena coords_flipped (X terbalik) merusak pose asimetris seperti 'G' dan 'H'.
+              coords.push(
+                pt.x / scale,
+                pt.y / scale,
+                pt.z / scale,
+              );
+            }
+
+            // Hitung sudut dan jarak menggunakan coords yang sudah benar secara kiralitas
+            const coordPts = [];
+            for (let i = 0; i < 63; i += 3) {
+              coordPts.push({ x: coords[i], y: coords[i + 1], z: coords[i + 2] });
+            }
+            const angles = computeAngleFeatures(coordPts);
+
+            // Compute distance features dari coords flat array (63 float)
+            const distances = computeDistanceFeatures(coords);
+
+            // Gabungkan: 63 koordinat + 15 sudut + 12 jarak = 90 fitur
+            const candidateLandmarks = [...coords, ...angles, ...distances]; // 90 elemen
+
+            // ── Landmark Jitter Filter ─────────────────────────────────────────────
+            // Jika koordinat berubah drastis dibanding frame sebelumnya, itu tandanya
+            // MediaPipe tidak stabil (biasanya karena background berantakan mengganggu tracking).
+            // Kita tolak frame tersebut sampai tangan "diam" kembali selama STABILITY_FRAMES frame.
+            let isStable = true;
+            if (prevLandmarkCoords !== null) {
+              let totalDiff = 0;
+              for (let i = 0; i < 63; i++) {
+                totalDiff += Math.abs(coords[i] - prevLandmarkCoords[i]);
+              }
+              const avgDiff = totalDiff / 63;
+              if (avgDiff > JITTER_THRESHOLD) {
+                // Tangan bergerak terlalu tiba-tiba — kemungkinan noise/jitter
+                stableFrameCount = 0;
+                isStable = false;
+              }
+            }
+
+            if (isStable) {
+              stableFrameCount++;
+              prevLandmarkCoords = coords.slice(); // simpan coords frame ini
+            } else {
+              prevLandmarkCoords = null; // reset, tidak simpan coords yang jittery
+            }
+
+            // Hanya kirim ke model jika sudah stabil selama STABILITY_FRAMES frame berturut
+            currentLandmarks =
+              stableFrameCount >= STABILITY_FRAMES ? candidateLandmarks : null;
+          }
+        } else {
+          currentLandmarks = null;
+        }
+
+        // ── Hand placement guide visibility ──
+        // Uses opacity (not display) to avoid layout recalculation
+        const handGuideEl = document.getElementById('handGuide');
+        if (handGuideEl) {
+          const handVisible = results.multiHandLandmarks && 
+                              results.multiHandLandmarks.length > 0;
+          handGuideEl.style.opacity = handVisible ? '0' : '1';
+        }
+
+        canvasCtx.restore();
+
+        // Kirim ke WebSocket (rate-limited)
+        const elapsed = performance.now() - lastSendTime;
+        if (
+          currentLandmarks &&
+          ws &&
+          ws.readyState === WebSocket.OPEN &&
+          elapsed >= SEND_INTERVAL_MS
+        ) {
+          lastSendTime = performance.now();
+          const sendStart = performance.now();
+          ws.send(JSON.stringify(currentLandmarks));
+          totalFramesSent++;
+          document.getElementById("statFrames").textContent = totalFramesSent;
+
+          // Estimasi latensi (round-trip kasar)
+          const latency = Math.round(performance.now() - sendStart);
+          document.getElementById("statLatency").textContent = latency + "ms";
+        }
+      }
+
+      // Inisialisasi Hands
+      const hands = new Hands({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 1, // 0=lite, 1=full
+        minDetectionConfidence: 0.7, // dinaikkan kembali agar tidak mudah salah deteksi di bg berantakan
+        minTrackingConfidence: 0.6, // dinaikkan agar tracking lebih stabil
+      });
+
+      hands.onResults(onResults);
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  CAMERA
+      // ═══════════════════════════════════════════════════════════════════
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await hands.send({ image: videoElement });
+        },
+        width: 1280,
+        height: 960,
+      });
+
+      let isCameraOn = true;
+
+      document
+        .getElementById("btnToggleCamera")
+        .addEventListener("click", () => {
+          const btn = document.getElementById("btnToggleCamera");
+          if (isCameraOn) {
+            camera.stop();
+            isCameraOn = false;
+            setCameraActive(false);
+            btn.textContent = "Nyalakan Kamera";
+            btn.classList.add("stop"); // menggunakan style merah (kelas .stop)
+            log("Kamera dimatikan", "warn");
+          } else {
+            camera
+              .start()
+              .then(() => {
+                isCameraOn = true;
+                btn.textContent = "Matikan Kamera";
+                btn.classList.remove("stop");
+                log("Kamera dinyalakan", "success");
+              })
+              .catch((err) => log("Gagal menyalakan kamera", "error"));
+          }
+        });
+
+      // Langsung nyalakan jika ingin default on, atau ubah logic jika ingin default off
+      camera
+        .start()
+        .then(() => {
+          log("Kamera aktif dan MediaPipe berjalan", "success");
+        })
+        .catch((err) => {
+          log(`Gagal akses kamera: ${err.message}`, "error");
+          console.error(err);
+        });
+
+      // ═══════════════════════════════════════════════════════════════════
+      //  INIT
+      // ═══════════════════════════════════════════════════════════════════
+      connectWebSocket();
+      log("Aplikasi dimuat. Menghubungkan ke server…", "info");
+    </script>
+  </body>
+</html>

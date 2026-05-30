@@ -1,0 +1,38 @@
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.env
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Datasets and Temporary Files
+*.csv
+*.jpg
+*.jpeg
+*.png
+data/raw/
+dataset/
+temp/
+tmp/
+
+# Machine Learning Checkpoints (Exclude intermediate models, keep final if desired)
+# *.h5
+# *.keras
+# *.tflite
+
+# System Cache Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo

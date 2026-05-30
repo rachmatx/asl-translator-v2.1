@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASL Data Collector</title>
+  <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico" />
+  <link rel="stylesheet" href="assets/theme.css">
+  <script src="assets/theme.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  </head>
+<body class="theme-collect">
+  <div class="app-wrapper">
+    <!-- ── Header ─────────────────────────────────────────────────── -->
+    <header>
+      <h1>Mode Koleksi Data Kustom</h1>
+      <p class="subtitle">
+        Rekam gaya bahasa isyarat alami Anda untuk adaptasi domain
+      </p>
+    </header>
+
+    <!-- ── Main Grid ───────────────────────────────────────────────── -->
+    <div class="main-grid">
+      <!-- Left: Camera -->
+      <div class="card camera-card">
+        <div class="camera-header">
+          <div style="display: flex; align-items: center">
+            <button
+              id="btnToggleCamera"
+              class="btn"
+              style="
+                padding: 6px 12px;
+                font-size: 12px;
+                border-radius: 6px;
+              "
+            >
+              Matikan Kamera
+            </button>
+          </div>
+          <div class="status-badge connected" id="wsStatus">
+            <span id="wsStatusText">● Kamera Aktif</span>
+          </div>
+        </div>
+
+        <div class="video-wrapper" style="position: relative;">
+          <div class="camera-placeholder" id="cameraPlaceholder">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" 
+                 viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" 
+                 stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 7 16 12 23 17V7z"/>
+              <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+            </svg>
+            <p>Kamera belum aktif</p>
+            <span>Tekan tombol untuk memulai</span>
+          </div>
+          <video id="videoElement" autoplay muted playsinline></video>
+          <canvas id="outputCanvas" width="640" height="480"></canvas>
+        </div>
+      </div>
+
+      <!-- Right: Side Panel -->
+      <div class="side-panel">
+        <div class="card prediction-card">
+          <div class="card-label"><span class="material-symbols-outlined">settings</span> Pengaturan Koleksi</div>
+          
+          <div style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+            <div>
+              <label style="color: var(--text-2); font-size: 12px; display: block; margin-bottom: 5px;">Pilih Huruf / Gestur:</label>
+              <select id="letterSelect" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-sm); font-family: 'Space Grotesk'; font-size: 16px;">
+                <script>
+                  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+                  letters.push('space', 'del', 'nothing');
+                  letters.forEach(l => document.write(`<option value="${l}">${l}</option>`));
+                </script>
+              </select>
+            </div>
+            
+            <div>
+              <label style="color: var(--text-2); font-size: 12px; display: block; margin-bottom: 5px;">Target Jumlah Sampel:</label>
+              <input type="number" id="targetSamples" value="200" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-1); border-radius: var(--radius-sm); font-family: 'Space Grotesk'; font-size: 16px;">
+            </div>
+
+            <div style="margin-top: 10px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); margin-bottom: 5px;">
+                <span>Progress: <span id="progressText">0</span> / <span id="progressTotal">200</span></span>
+              </div>
+              <div id="progress-bar">
+                <div id="progress-fill"></div>
+              </div>
+            </div>
+            
+            <div id="logMsg" style="text-align: center; font-size: 12px; font-weight: 600; min-height: 15px;"></div>
+          </div>
+        </div>
+
+        <div class="card word-card" id="kontrolKoleksiCard">
+          <div class="card-label"><span class="material-symbols-outlined">sports_esports</span> Kontrol Koleksi</div>
+          <div class="word-controls" style="flex-direction: column;">
+            <button class="btn btn-primary" id="btnStart" onclick="startCollect()" style="padding: 15px; font-size: 14px;">▶ MULAI REKAM</button>
+            <button class="btn stop" id="btnStop" onclick="stopCollect()" style="padding: 15px; font-size: 14px;">⏹ STOP</button>
+            <button class="btn" id="btnExport" onclick="exportCSV()" style="padding: 15px; font-size: 14px; background: rgba(0, 212, 255, 0.2); border-color: rgba(0, 212, 255, 0.4); color: #00d4ff;"><span class="material-symbols-outlined">save</span> EXPORT CSV</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const videoElement = document.getElementById('videoElement');
+const canvasElement = document.getElementById('outputCanvas');
+const canvasCtx = canvasElement.getContext('2d');
+
+function setCameraActive(isActive) {
+  const placeholder = document.getElementById('cameraPlaceholder');
+  if (placeholder) {
+    placeholder.style.display = isActive ? 'none' : 'flex';
+  }
+}
+videoElement.addEventListener('playing', () => setCameraActive(true));
+
+let collectActive = false;
+let collectClass = 'A';
+let collectTarget = 200;
+let collectedData = [];
+
+// ── Angle Features (Sama persis dengan train.py) ────────────────
+const ANGLE_TRIPLETS = [
+  [0,1,2],   [1,2,3],   [2,3,4],
+  [0,5,6],   [5,6,7],   [6,7,8],
+  [0,9,10],  [9,10,11], [10,11,12],
+  [0,13,14], [13,14,15],[14,15,16],
+  [0,17,18], [17,18,19],[18,19,20],
+];
+
+function computeAngleFeatures(pts) {
+  function vecAngle(ai, bi, ci) {
+    const v1x = pts[ai].x - pts[bi].x, v1y = pts[ai].y - pts[bi].y, v1z = pts[ai].z - pts[bi].z;
+    const v2x = pts[ci].x - pts[bi].x, v2y = pts[ci].y - pts[bi].y, v2z = pts[ci].z - pts[bi].z;
+    const dot  = v1x*v2x + v1y*v2y + v1z*v2z;
+    const mag1 = Math.sqrt(v1x**2 + v1y**2 + v1z**2) + 1e-8;
+    const mag2 = Math.sqrt(v2x**2 + v2y**2 + v2z**2) + 1e-8;
+    return Math.acos(Math.max(-1.0, Math.min(1.0, dot / (mag1 * mag2))));
+  }
+  return ANGLE_TRIPLETS.map(([a, b, c]) => vecAngle(a, b, c));
+}
+
+const DIST_PAIRS = [
+  [4,  8], [4, 12], [4, 16], [4, 20],   // jempol ke ujung jari lain
+  [8, 12], [12,16], [16,20],            // antar ujung jari berdekatan
+  [4,  0], [8,  0], [12, 0], [16, 0], [20, 0], // ujung jari ke wrist
+];
+
+function computeDistanceFeatures(coords) {
+  const pts = [];
+  for (let i = 0; i < 63; i += 3) {
+    pts.push({ x: coords[i], y: coords[i+1], z: coords[i+2] });
+  }
+  return DIST_PAIRS.map(([a, b]) => {
+    const dx = pts[a].x - pts[b].x;
+    const dy = pts[a].y - pts[b].y;
+    const dz = pts[a].z - pts[b].z;
+    return Math.sqrt(dx*dx + dy*dy + dz*dz);
+  });
+}
+
+function alignRotation(pts) {
+  const mag_f = Math.sqrt(pts[9].x**2 + pts[9].y**2 + pts[9].z**2) + 1e-8;
+  const ux = pts[9].x / mag_f, uy = pts[9].y / mag_f, uz = pts[9].z / mag_f;
+
+  const dot_su = pts[17].x*ux + pts[17].y*uy + pts[17].z*uz;
+  const rx = pts[17].x - dot_su*ux;
+  const ry = pts[17].y - dot_su*uy;
+  const rz = pts[17].z - dot_su*uz;
+  const mag_r = Math.sqrt(rx*rx + ry*ry + rz*rz) + 1e-8;
+  const vx = rx / mag_r, vy = ry / mag_r, vz = rz / mag_r;
+
+  const wx = uy*vz - uz*vy;
+  const wy = uz*vx - ux*vz;
+  const wz = ux*vy - uy*vx;
+
+  return pts.map(p => ({
+    x: p.x*ux + p.y*uy + p.z*uz,
+    y: p.x*vx + p.y*vy + p.z*vz,
+    z: p.x*wx + p.y*wy + p.z*wz,
+  }));
+}
+
+function startCollect() {
+  collectClass = document.getElementById('letterSelect').value;
+  collectTarget = parseInt(document.getElementById('targetSamples').value);
+  document.getElementById('progressTotal').textContent = collectTarget;
+  document.getElementById('logMsg').textContent = `Merekam...`;
+  
+  // Clear previous data for this class if re-recording
+  collectedData = collectedData.filter(d => d.label !== collectClass);
+  updateProgress();
+  
+  collectActive = true;
+}
+
+function stopCollect() {
+  collectActive = false;
+  document.getElementById('logMsg').textContent = `Berhenti. Terkumpul: ${collectedData.filter(d => d.label === collectClass).length}`;
+}
+
+function updateProgress() {
+  const count = collectedData.filter(d => d.label === collectClass).length;
+  document.getElementById('progressText').textContent = count;
+  const pct = Math.min(100, (count / collectTarget) * 100);
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = Math.max(pct, 3) + '%'; // min 3% visual
+  // Color stage: mid (orange) at ≥60%, done (green) at 100%
+  if (pct >= 100)      fill.dataset.stage = 'done';
+  else if (pct >= 60)  fill.dataset.stage = 'mid';
+  else                 delete fill.dataset.stage;
+  
+  if (count >= collectTarget && collectActive) {
+    collectActive = false;
+    document.getElementById('logMsg').textContent = `[OK] Selesai! ${collectTarget} sampel ${collectClass} terkumpul.`;
+  }
+}
+
+function onResults(results) {
+  canvasCtx.save();
+  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+  if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+    const landmarks = results.multiHandLandmarks[0];
+
+    // Gambar Landmark sederhana
+    canvasCtx.fillStyle = '#00ff00';
+    for (let i = 0; i < landmarks.length; i++) {
+      const x = landmarks[i].x * canvasElement.width;
+      const y = landmarks[i].y * canvasElement.height;
+      canvasCtx.beginPath();
+      canvasCtx.arc(x, y, 4, 0, 2 * Math.PI);
+      canvasCtx.fill();
+    }
+
+    if (collectActive) {
+      // Translasi & Skala (Sama dengan index.html)
+      const base_x = landmarks[0].x, base_y = landmarks[0].y, base_z = landmarks[0].z;
+      const translated = landmarks.map(lm => ({
+        x: lm.x - base_x, y: lm.y - base_y, z: lm.z - base_z
+      }));
+      
+      const ref_dist = Math.sqrt(translated[9].x**2 + translated[9].y**2 + translated[9].z**2);
+      if (ref_dist > 1e-6) {
+        let flipX = false;
+        if (results.multiHandedness && results.multiHandedness.length > 0) {
+          flipX = (results.multiHandedness[0].label === 'Right');
+        }
+
+        const rotated = alignRotation(translated);
+        const ref_dist2 = Math.sqrt(rotated[9].x**2 + rotated[9].y**2 + rotated[9].z**2);
+        const scale = ref_dist2 < 1e-6 ? ref_dist : ref_dist2;
+
+        const coords = [];
+        for (const pt of rotated) {
+          const xNorm = pt.x / scale;
+          coords.push(flipX ? -xNorm : xNorm, pt.y / scale, pt.z / scale);
+        }
+
+        const rotatedScaled = rotated.map(p => ({ x: p.x/scale, y: p.y/scale, z: p.z/scale }));
+        const angles = computeAngleFeatures(rotatedScaled);
+        const distances = computeDistanceFeatures(coords);
+
+        const features90 = [...coords, ...angles, ...distances];
+        
+        collectedData.push({ label: collectClass, coords: features90 });
+        updateProgress();
+      }
+    }
+  }
+  canvasCtx.restore();
+}
+
+const hands = new Hands({ locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}` });
+hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.5 });
+hands.onResults(onResults);
+
+const camera = new Camera(videoElement, {
+  onFrame: async () => { await hands.send({ image: videoElement }); },
+  width: 640, height: 480
+});
+
+let isCameraOn = true;
+const btnToggleCamera = document.getElementById("btnToggleCamera");
+if (btnToggleCamera) {
+  btnToggleCamera.addEventListener("click", () => {
+    if (isCameraOn) {
+      camera.stop();
+      isCameraOn = false;
+      setCameraActive(false);
+      btnToggleCamera.textContent = "Nyalakan Kamera";
+      btnToggleCamera.classList.add("stop");
+    } else {
+      camera.start().then(() => {
+        isCameraOn = true;
+        btnToggleCamera.textContent = "Matikan Kamera";
+        btnToggleCamera.classList.remove("stop");
+      });
+    }
+  });
+}
+camera.start();
+
+function exportCSV() {
+  if (collectedData.length === 0) {
+    alert("Belum ada data yang dikumpulkan!"); return;
+  }
+  
+  // Header: label, x0,y0,z0 ... x20,y20,z20, angle0 ... angle14, dist0 ... dist11
+  const header = ['label'];
+  for(let i=0; i<21; i++) header.push(`x${i}`, `y${i}`, `z${i}`);
+  for(let i=0; i<15; i++) header.push(`angle${i}`);
+  for(let i=0; i<12; i++) header.push(`dist${i}`);
+  
+  const rows = collectedData.map(d => [d.label, ...d.coords]);
+  const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type: 'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `custom_data_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>
