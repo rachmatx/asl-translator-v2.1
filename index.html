@@ -60,7 +60,7 @@
             <div style="display: flex; align-items: center">
               <button
                 id="btnToggleCamera"
-                class="btn"
+                class="btn stop"
                 style="
                   padding: 6px 12px;
                   font-size: 12px;
@@ -1359,7 +1359,8 @@
             isCameraOn = false;
             setCameraActive(false);
             btn.textContent = "Nyalakan Kamera";
-            btn.classList.add("stop"); // menggunakan style merah (kelas .stop)
+            btn.classList.remove("stop");
+            btn.classList.add("start"); // menggunakan style hijau
             log("Kamera dimatikan", "warn");
           } else {
             camera
@@ -1367,7 +1368,8 @@
               .then(() => {
                 isCameraOn = true;
                 btn.textContent = "Matikan Kamera";
-                btn.classList.remove("stop");
+                btn.classList.remove("start");
+                btn.classList.add("stop"); // menggunakan style merah
                 log("Kamera dinyalakan", "success");
               })
               .catch((err) => log("Gagal menyalakan kamera", "error"));
