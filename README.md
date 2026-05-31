@@ -6,15 +6,15 @@ Aplikasi berbasis web untuk menerjemahkan bahasa isyarat American Sign Language 
 
 ## Daftar Isi
 
-1. [Fitur Utama](#-fitur-utama)
-2. [Arsitektur Sistem](#-arsitektur-sistem)
-3. [Spesifikasi Lingkungan & Dependensi](#-spesifikasi-lingkungan--dependensi)
-4. [Petunjuk Instalasi & Cara Menjalankan](#-petunjuk-instalasi--cara-menjalankan)
-5. [Pre-processing & Rekayasa Fitur](#-pre-processing--rekayasa-fitur)
-6. [Siklus Koleksi Data Kustom & Pelatihan Ulang](#-siklus-koleksi-data-kustom--pelatihan-ulang)
-7. [Detail Model MLP & Pelatihan](#-detail-model-mlp--pelatihan)
-8. [Teknik Optimasi Latensi & Akurasi](#-teknik-optimasi-latensi--koleksi)
-9. [Struktur Direktori](#-struktur-direktori)
+1. [Fitur Utama](#fitur-utama)
+2. [Arsitektur Sistem](#arsitektur-sistem)
+3. [Spesifikasi Lingkungan & Dependensi](#spesifikasi-lingkungan--dependensi)
+4. [Petunjuk Instalasi & Cara Menjalankan](#petunjuk-instalasi--cara-menjalankan)
+5. [Pre-processing & Rekayasa Fitur](#pre-processing--rekayasa-fitur)
+6. [Siklus Koleksi Data Kustom & Pelatihan Ulang](#siklus-koleksi-data-kustom--pelatihan-ulang)
+7. [Detail Model MLP & Pelatihan](#detail-model-mlp--pelatihan)
+8. [Teknik Optimasi Latensi & Akurasi](#teknik-optimasi-latensi--akurasi)
+9. [Struktur Direktori](#struktur-direktori)
 
 ---
 
@@ -63,7 +63,8 @@ graph TD
 ```
 
 ### Alur Komunikasi WebSocket (Sequence Diagram)
-Untuk memastikan respon latensi rendah tanpa batas HTTP *overhead*, komunikasi difasilitasi dengan arsitektur *event-driven* melalui WebSocket:
+
+Untuk memastikan respon latensi rendah tanpa _HTTP overhead_, komunikasi difasilitasi dengan arsitektur _event-driven_ melalui WebSocket:
 
 ```mermaid
 sequenceDiagram
@@ -104,13 +105,13 @@ Agar aplikasi berjalan tanpa konflik, pastikan lingkungan pengembangan Anda meme
 
 - **Versi Python**: `3.11.0` (64-bit) sangat direkomendasikan untuk menghindari konflik biner MediaPipe dan NumPy 2.x di Windows.
 - **Dependensi Utama (`requirements.txt`)**:
-  - `numpy==1.26.4` (Membatasi versi di bawah NumPy 2.0)
-  - `mediapipe==0.10.14` (Deteksi pose tangan)
-  - `tensorflow==2.15.1` & `keras==2.15.0` (Framework Deep Learning)
-  - `opencv-python==4.11.0.86` (Pengolahan gambar citra latih)
-  - `pandas==3.0.2` & `scikit-learn==1.8.0` (Manipulasi dataset & preprocessing)
-  - `fastapi`, `uvicorn`, `websockets` (Backend Server & Real-time protocol)
-  - `pyspellchecker` (Spell checker koreksi teks bahasa Inggris)
+  - `numpy==1.26.4` — Membatasi versi di bawah NumPy 2.0
+  - `mediapipe==0.10.14` — Deteksi pose tangan
+  - `tensorflow==2.15.1` & `keras==2.15.0` — Framework Deep Learning
+  - `opencv-python==4.11.0.86` — Pengolahan gambar citra latih
+  - `pandas==3.0.2` & `scikit-learn==1.8.0` — Manipulasi dataset & preprocessing
+  - `fastapi`, `uvicorn`, `websockets` — Backend Server & Real-time protocol
+  - `pyspellchecker` — Spell checker koreksi teks bahasa Inggris
 
 ---
 
@@ -118,34 +119,27 @@ Agar aplikasi berjalan tanpa konflik, pastikan lingkungan pengembangan Anda meme
 
 ### 1. Kloning Repositori
 
-Masuk ke direktori kerja proyek Anda:
-
 ```bash
 git clone https://github.com/rachmatx/asl-translator-v2.1.git
 cd "asl translator v2.1"
 ```
 
-### 2. Setup Virtual Environment (Rekomendasi)
+### 2. Setup Virtual Environment
 
 Buat dan aktifkan virtual environment agar dependensi terisolasi:
 
 ```powershell
-# Menggunakan PowerShell
 python -m venv venv
 .\venv\Scripts\Activate
 ```
 
 ### 3. Instalasi Dependensi
 
-Lakukan instalasi seluruh library yang dibutuhkan:
-
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Jalankan Server Backend (FastAPI)
-
-Jalankan server menggunakan Uvicorn di localhost dengan port 8000:
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -155,10 +149,10 @@ Server backend akan dimuat, melakukan _warm-up_ model TensorFlow, dan siap mende
 
 ### 5. Akses Aplikasi Frontend
 
-Karena aplikasi sekarang dilayani langsung oleh FastAPI, Anda tidak perlu membuka file HTML secara terpisah atau menggunakan ekstensi Live Server. Cukup buka browser dan akses:
+Karena aplikasi dilayani langsung oleh FastAPI, tidak perlu membuka file HTML secara terpisah. Buka browser dan akses:
 
-- **Aplikasi Utama**: Akses `http://localhost:8000` - Halaman utama untuk penerjemah ASL, TTS, dan Flashcard.
-- **Kolektor Data & Analisis (Khusus Lokal)**: File `collect_data.html` dan `stats.html` dalam folder `tools/` hanya tersedia di penyimpanan lokal untuk keperluan pengembangan dan keamanan produksi. Buka langsung di browser lokal Anda.
+- **Aplikasi Utama**: `http://localhost:8000` — Halaman utama untuk penerjemah ASL, TTS, dan Flashcard.
+- **Kolektor Data & Analisis (Khusus Lokal)**: File `collect_data.html` dan `stats.html` dalam folder `tools/` hanya tersedia di penyimpanan lokal untuk keperluan pengembangan. Buka langsung di browser lokal Anda.
 
 ---
 
@@ -166,14 +160,12 @@ Karena aplikasi sekarang dilayani langsung oleh FastAPI, Anda tidak perlu membuk
 
 Untuk menghasilkan model yang ringan namun akurat, koordinat mentah MediaPipe diproses menjadi 90 fitur representatif:
 
-```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              TOTAL INPUT FITUR (90 Kolom)                               │
-├─────────────────────────────────────┬──────────────────────────┬───────────────────────┤
-│    63 Koordinat Tangan Ter-align     │   15 Sudut Ruas Jari    │   12 Jarak Kunci      │
-│     (21 Titik Landmark x, y, z)     │  (Rotation & Scale Inv)  │   (Scale Normalized)  │
-└─────────────────────────────────────┴──────────────────────────┴───────────────────────┘
-```
+| Kelompok Fitur                        | Jumlah | Keterangan                                      |
+|---------------------------------------|--------|-------------------------------------------------|
+| Koordinat Tangan Ter-align (x, y, z)  | 63     | 21 titik landmark setelah normalisasi kanonik   |
+| Sudut Ruas Jari (Joint Angles)        | 15     | Invariant terhadap rotasi dan skala             |
+| Jarak Kunci (Key Distances)           | 12     | Dinormalisasi terhadap skala tangan             |
+| **Total Input Fitur**                 | **90** |                                                 |
 
 ### 1. Normalisasi Posisi & Skala
 
@@ -184,16 +176,20 @@ Untuk menghasilkan model yang ringan namun akurat, koordinat mentah MediaPipe di
 
 Rotasi tangan diatasi dengan memproyeksikan seluruh koordinat 3D ke basis ortogonal baru (telapak tangan menghadap ke depan secara standar):
 
-- **Vektor Forward ($u$)**: Arah dari Landmark 0 ke Landmark 9 (Arah vertikal telapak tangan).
-- **Vektor Side ($v$)**: Arah ortogonal telapak tangan ke samping, dibangun dari proyeksi Landmark 17 (Pinky MCP) tegak lurus dengan $u$.
-- **Vektor Normal ($w$)**: Hasil dari perkalian silang (_cross product_) $u \times v$.
-  Semua koordinat 3D dikalikan dengan matriks rotasi basis $[u, v, w]^T$ untuk menghasilkan koordinat kanonik.
+- **Vektor Forward (u)**: Arah dari Landmark 0 ke Landmark 9 (arah vertikal telapak tangan).
+- **Vektor Side (v)**: Arah ortogonal telapak tangan ke samping, dibangun dari proyeksi Landmark 17 (Pinky MCP) tegak lurus dengan u.
+- **Vektor Normal (w)**: Hasil dari perkalian silang (_cross product_) u x v.
+
+Semua koordinat 3D dikalikan dengan matriks rotasi basis `[u, v, w]^T` untuk menghasilkan koordinat kanonik.
 
 ### 3. Fitur Tambahan (Feature Engineering)
 
-- **15 Sudut Sendi (Angle Features)**: Dihitung pada setiap titik tengah sendi jari dari 15 triplet landmark ($A, B, C$) menggunakan rumus:
+- **15 Sudut Sendi (Angle Features)**: Dihitung pada setiap titik tengah sendi jari dari 15 triplet landmark (A, B, C) menggunakan rumus:
+
   $$\theta = \arccos\left(\frac{\vec{BA} \cdot \vec{BC}}{|\vec{BA}| \times |\vec{BC}|}\right)$$
+
   Fitur ini sangat stabil terhadap perputaran telapak tangan karena murni mengukur kelenturan jari.
+
 - **12 Jarak Kunci (Distance Features)**: Mengukur jarak Euclidean antar ujung-ujung jari (Jempol ke Telunjuk, Tengah, Manis, Kelingking), jarak antar ujung jari yang berdekatan (untuk membedakan huruf `U`, `V`, dan `R`), serta jarak ujung jari ke pergelangan tangan (melihat tangan terkepal atau terbuka).
 
 ---
@@ -214,7 +210,7 @@ flowchart LR
     H --> I[Restart main.py Server]
 ```
 
-### Langkah Penggabungan & Pelatihan Ulang:
+### Langkah Penggabungan & Pelatihan Ulang
 
 1. Pindahkan file CSV hasil rekaman dari unduhan browser ke direktori `training/data/`.
 2. Jalankan skrip penggabungan dari dalam folder `training/`:
@@ -226,7 +222,7 @@ flowchart LR
    ```bash
    python train.py
    ```
-   _Catatan_: Jika Anda ingin mengekstrak ulang seluruh dataset mentah di folder `training/dataset_asl`, hapus berkas `landmarks_temp.csv` terlebih dahulu, lalu jalankan `train.py`.
+   Catatan: Jika Anda ingin mengekstrak ulang seluruh dataset mentah di folder `training/dataset_asl`, hapus berkas `landmarks_temp.csv` terlebih dahulu, lalu jalankan `train.py`.
 
 ---
 
@@ -234,23 +230,25 @@ flowchart LR
 
 Model yang digunakan adalah Multi-Layer Perceptron (MLP) yang sangat efisien namun tangguh.
 
-### Arsitektur Model:
+### Arsitektur Model
 
-1. **Input Layer**: 90 Fitur (Landmarks, Sudut, Jarak)
-2. **Dense Layer 1**: 512 Unit + ReLU + Batch Normalization + Dropout (40%)
-3. **Dense Layer 2**: 256 Unit + ReLU + Batch Normalization + Dropout (35%)
-4. **Dense Layer 3**: 128 Unit + ReLU + Batch Normalization + Dropout (30%)
-5. **Dense Layer 4**: 64 Unit + ReLU + Batch Normalization + Dropout (20%)
-6. **Output Layer**: 29 Kelas (A-Z, del, space, nothing) + Softmax
+| Layer        | Konfigurasi                                          |
+|--------------|------------------------------------------------------|
+| Input        | 90 fitur (Landmarks, Sudut, Jarak)                   |
+| Dense 1      | 512 unit + ReLU + Batch Normalization + Dropout 40%  |
+| Dense 2      | 256 unit + ReLU + Batch Normalization + Dropout 35%  |
+| Dense 3      | 128 unit + ReLU + Batch Normalization + Dropout 30%  |
+| Dense 4      | 64 unit + ReLU + Batch Normalization + Dropout 20%   |
+| Output       | 29 kelas (A-Z, del, space, nothing) + Softmax        |
 
-### Strategi Pelatihan (`train.py`):
+### Strategi Pelatihan (`train.py`)
 
 - **Optimizer**: `AdamW` (Adam dengan weight decay `1e-4` terintegrasi untuk mencegah overfitting).
 - **Label Smoothing**: Menggunakan nilai `0.1` pada fungsi Categorical Crossentropy untuk memperhalus target probabilitas (dari `[0, 1]` menjadi `[0.05, 0.95]`). Ini meningkatkan ketahanan model terhadap kesalahan label data latih.
 - **Callbacks**:
-  - `EarlyStopping`: Berhenti jika akurasi data validasi tidak meningkat selama 12 epoch.
-  - `ReduceLROnPlateau`: Memotong learning rate menjadi setengahnya jika loss validasi mengalami kebuntuan selama 6 epoch.
-  - `ModelCheckpoint`: Otomatis menyimpan bobot model terbaik berdasarkan akurasi validasi tertinggi.
+  - `EarlyStopping` — Berhenti jika akurasi data validasi tidak meningkat selama 12 epoch.
+  - `ReduceLROnPlateau` — Memotong learning rate menjadi setengahnya jika loss validasi mengalami kebuntuan selama 6 epoch.
+  - `ModelCheckpoint` — Otomatis menyimpan bobot model terbaik berdasarkan akurasi validasi tertinggi.
 
 ---
 
@@ -258,24 +256,25 @@ Model yang digunakan adalah Multi-Layer Perceptron (MLP) yang sangat efisien nam
 
 Untuk memastikan aplikasi berjalan dengan mulus di perangkat klien dan server tanpa delay, beberapa optimasi khusus diimplementasikan:
 
-1. **Direct TensorFlow Graph Execution (di Backend)**:
-   Di `main.py`, alur inferensi menggunakan pemanggilan fungsi kelas model secara langsung (`model(features)`) ketimbang `model.predict()`. Ini memangkas _overhead_ internal TensorFlow untuk ukuran batch 1, **meningkatkan kecepatan inferensi hingga 2x-5x lipat**.
-2. **Model Graph Warm-Up**:
-   Saat server FastAPI dimulai (_startup lifespan_), server mengirimkan satu sampel tiruan (zero matrix) ke model untuk menyusun grafik TF. Hal ini mencegah terjadinya latensi tinggi (ngadat) pada frame deteksi pertama ketika klien terhubung.
-3. **Temporal Rolling Average (Smoothing)**:
+1. **Direct TensorFlow Graph Execution (di Backend)**
+   Di `main.py`, alur inferensi menggunakan pemanggilan fungsi kelas model secara langsung (`model(features)`) ketimbang `model.predict()`. Ini memangkas _overhead_ internal TensorFlow untuk ukuran batch 1, meningkatkan kecepatan inferensi hingga 2x-5x lipat.
+
+2. **Model Graph Warm-Up**
+   Saat server FastAPI dimulai (_startup lifespan_), server mengirimkan satu sampel tiruan (zero matrix) ke model untuk menyusun grafik TF. Hal ini mencegah terjadinya latensi tinggi pada frame deteksi pertama ketika klien terhubung.
+
+3. **Temporal Rolling Average (Smoothing)**
    Untuk mengurangi getaran deteksi akibat noise visual latar belakang, backend menyimpan 9 prediksi probabilitas terakhir dalam antrean `deque` per koneksi WebSocket. Klasifikasi akhir diambil dari rata-rata probabilitas terhalus.
-4. **Data Augmentasi Lanjut**:
-   Selama proses pembuatan dataset di `train.py`, setiap sampel foto tangan diaugmentasi secara otomatis sebanyak **12 kali** menggunakan:
+
+4. **Data Augmentasi Lanjut**
+   Selama proses pembuatan dataset di `train.py`, setiap sampel foto tangan diaugmentasi secara otomatis sebanyak 12 kali menggunakan:
    - Pencerminan sumbu X (untuk mengenali tangan kiri dan kanan secara adil).
    - Penambahan Gaussian Noise (simulasi getaran kamera).
-   - Variasi Skala sebesar $\pm 10\%$.
-   - Rotasi 3D sebesar $\pm 10^\circ$ di tiga sumbu ($x, y, z$).
+   - Variasi Skala sebesar +/- 10%.
+   - Rotasi 3D sebesar +/- 10 derajat di tiga sumbu (x, y, z).
 
 ---
 
 ## Struktur Direktori
-
-Berikut adalah susunan file utama dalam proyek ini:
 
 ```
 asl-dump-hibrid/
@@ -286,25 +285,25 @@ asl-dump-hibrid/
 │   ├── train.py            # Pipeline ekstraksi fitur, augmentasi data, & pelatihan MLP
 │   └── custom_merge.py     # Alat bantu CLI penggabung CSV data kustom ke dataset utama
 │
-├── tools/                  # Halaman statis tambahan (Tidak diunggah ke GitHub / Khusus Lokal)
+├── tools/                  # Halaman statis tambahan (tidak diunggah ke GitHub / khusus lokal)
 │   ├── collect_data.html   # Antarmuka perekam data kustom via kamera klien
 │   └── stats.html          # Antarmuka visual Confusion Matrix & real-time tester
 │
-├── docs/                   # Direktori Dokumentasi Proyek
+├── docs/                   # Direktori dokumentasi proyek
 │   ├── PRD.md              # Product Requirements Document
-│   └── design.md           # Spesifikasi Desain Sistem & Tema
+│   └── design.md           # Spesifikasi desain sistem & tema
 │
-├── assets/                 # Aset Frontend (CSS, JS, Ikon, Gambar)
+├── assets/                 # Aset frontend (CSS, JS, ikon, gambar)
 │
-├── main.py                 # Backend API FastAPI, WebSocket Classifier, & Melayani Frontend
+├── main.py                 # Backend API FastAPI, WebSocket Classifier, & melayani frontend
 ├── index.html              # Aplikasi antarmuka web utama (Penerjemah, TTS, Flashcard)
 ├── Dockerfile              # Konfigurasi container untuk mempermudah deployment
-├── requirements.txt        # Daftar library python yang wajib diinstal
+├── requirements.txt        # Daftar library Python yang wajib diinstal
 ├── model_mlp_asl.h5        # Berkas model biner hasil pelatihan
 ├── classes.npy             # Mapping kelas biner NumPy untuk huruf keluaran
-└── README.md               # Dokumentasi Proyek (Berkas ini)
+└── README.md               # Dokumentasi proyek (berkas ini)
 ```
 
 ---
 
-_Catatan Presentasi_: Jalankan server FastAPI terlebih dahulu sebelum membuka halaman HTML mana pun agar koneksi WebSocket berjalan dengan sukses. Pastikan kamera laptop Anda bersih dan memiliki pencahayaan yang cukup untuk deteksi MediaPipe yang optimal.
+Catatan: Jalankan server FastAPI terlebih dahulu sebelum membuka halaman HTML mana pun agar koneksi WebSocket berjalan dengan sukses. Pastikan kamera laptop Anda bersih dan memiliki pencahayaan yang cukup untuk deteksi MediaPipe yang optimal.
