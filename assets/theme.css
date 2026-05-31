@@ -590,9 +590,7 @@ body.theme-clean #mainPrediction {
   font-weight: 600;
   color: var(--accent-2);
   min-height: 64px;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  display: block;
   word-break: break-all;
   overflow-wrap: anywhere;
   margin-bottom: 16px;
