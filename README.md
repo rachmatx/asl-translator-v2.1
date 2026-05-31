@@ -121,7 +121,8 @@ Agar aplikasi berjalan tanpa konflik, pastikan lingkungan pengembangan Anda meme
 Masuk ke direktori kerja proyek Anda:
 
 ```bash
-cd "C:\Users\R\DOwnload\Documents\"
+git clone https://github.com/rachmatx/asl-translator-v2.1.git
+cd "asl translator v2.1"
 ```
 
 ### 2. Setup Virtual Environment (Rekomendasi)
