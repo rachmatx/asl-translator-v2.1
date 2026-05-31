@@ -576,6 +576,13 @@ body.theme-neobrutalism .flashcard-btn-stop {
 body.theme-neobrutalism .guide-card {
   background: #FFDE59 !important; /* Yellow */
 }
+.guide-image-container {
+  width: 90%;
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
 body.theme-neobrutalism .guide-image-container {
   background: #ffffff !important;
   border: 2px solid #000000 !important;
@@ -588,7 +595,8 @@ body.theme-clean .guide-image-container {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
 }
 body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
-  border: 2px solid #000000 !important;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
 }
 
 /* Mobile responsive layout fixes */
