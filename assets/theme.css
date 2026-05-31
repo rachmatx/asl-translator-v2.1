@@ -592,6 +592,9 @@ body.theme-clean #mainPrediction {
   min-height: 64px;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
   margin-bottom: 16px;
 }
 body.theme-neobrutalism .word-display {
