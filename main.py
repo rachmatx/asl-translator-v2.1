@@ -37,9 +37,9 @@ spell = SpellChecker(distance=1)
 # ── Konfigurasi ─────────────────────────────────────────────────────────────────
 MODEL_PATH           = "models/model_mlp_asl.h5"
 CLASSES_PATH         = "models/classes.npy"
-CONFIDENCE_THRESHOLD = 0.50   # Kirim prediksi hanya jika confidence > 50%
-INPUT_DIM            = 90     # 63 koordinat + 15 sudut + 12 jarak (sinkron dengan train.py)
-SMOOTH_BUFFER_SIZE   = 3      # Diturunkan ke 3 agar prediksi lebih responsif (G vs I)
+CONFIDENCE_THRESHOLD = 0.50
+INPUT_DIM            = 90
+SMOOTH_BUFFER_SIZE   = 3
 
 # ── State global (diisi saat startup) ───────────────────────────────────────────
 app_state: dict = {
@@ -73,11 +73,9 @@ async def lifespan(app: FastAPI):
             "Jalankan train.py terlebih dahulu."
         )
 
-    # compile=False digunakan untuk melewati bug AdamW di Keras 2.15
     model   = keras.models.load_model(MODEL_PATH, compile=False)
     classes = np.load(CLASSES_PATH, allow_pickle=True)
 
-    # Verifikasi dimensi input model vs INPUT_DIM
     model_input_dim = model.input_shape[-1]
     if model_input_dim != INPUT_DIM:
         raise ValueError(
@@ -85,8 +83,6 @@ async def lifespan(app: FastAPI):
             f"Hapus landmarks_temp.csv dan latih ulang dengan train.py."
         )
 
-    # Warm-up: jalankan satu prediksi dummy agar TF graph ter-compile
-    # Ini menghilangkan latensi tinggi pada prediksi pertama
     dummy = np.zeros((1, INPUT_DIM), dtype=np.float32)
     _ = model(dummy, training=False)
     print("[INFO] TF graph warm-up selesai.")
@@ -99,7 +95,7 @@ async def lifespan(app: FastAPI):
     print(f"     Kelas: {classes.tolist()}")
     print("[OK] Server siap menerima koneksi WebSocket.")
 
-    yield  # Server berjalan
+    yield
 
     print("[INFO] Server dimatikan.")
 
@@ -162,14 +158,11 @@ async def spellcheck(word: str):
         
     word = word.lower()
     
-    # Jika kata sudah benar, pyspellchecker mengembalikannya apa adanya.
-    # Jika typo, kembalikan koreksi terbaik (bisa None jika tidak ketemu)
     corrected = spell.correction(word)
     
     if corrected:
         return {"original": word, "corrected": corrected.upper()}
     else:
-        # Jika tidak ditemukan koreksi (misal kata aneh sekali), kembalikan aslinya
         return {"original": word, "corrected": word.upper()}
 
 
@@ -191,14 +184,12 @@ async def websocket_predict(websocket: WebSocket):
     model   = app_state["model"]
     classes = app_state["classes"]
 
-    # Buffer temporal smoothing per-koneksi (reset otomatis saat client disconnect)
     pred_buffer: deque = deque(maxlen=SMOOTH_BUFFER_SIZE)
 
     try:
         while True:
             raw = await websocket.receive_text()
 
-            # Parse JSON
             try:
                 data = json.loads(raw)
             except json.JSONDecodeError:
@@ -207,37 +198,37 @@ async def websocket_predict(websocket: WebSocket):
                 }))
                 continue
 
-            # Validasi panjang
-            if not isinstance(data, list) or len(data) != INPUT_DIM:
-                received = len(data) if isinstance(data, list) else "bukan list"
+            client_timestamp = None
+            if isinstance(data, dict) and "features" in data and "timestamp" in data:
+                client_timestamp = data["timestamp"]
+                features_list = data["features"]
+            else:
+                features_list = data
+
+            if not isinstance(features_list, list) or len(features_list) != INPUT_DIM:
+                received = len(features_list) if isinstance(features_list, list) else "bukan list"
                 await websocket.send_text(json.dumps({
                     "error": f"Array harus {INPUT_DIM} elemen, diterima: {received}"
                 }))
                 continue
 
-            # Konversi ke tensor
             try:
-                features = np.array(data, dtype=np.float32).reshape(1, INPUT_DIM)
+                features = np.array(features_list, dtype=np.float32).reshape(1, INPUT_DIM)
             except (ValueError, TypeError) as e:
                 await websocket.send_text(json.dumps({"error": f"Konversi data gagal: {e}"}))
                 continue
 
             # ── Inferensi cepat via model() langsung (bukan model.predict()) ──────
-            # model() sekitar 2-5x lebih cepat untuk batch_size=1 karena
-            # tidak melalui overhead predict() wrapper
-            raw_probs = model(features, training=False).numpy()[0]  # shape: (num_classes,)
+            raw_probs = model(features, training=False).numpy()[0]
 
             # ── Temporal Smoothing ──────────────────────────────────────────────
-            # Rata-rata probabilitas dari N frame terakhir untuk mengurangi
-            # fluktuasi prediksi antar frame
             pred_buffer.append(raw_probs)
-            avg_probs    = np.mean(list(pred_buffer), axis=0)  # shape: (num_classes,)
+            avg_probs    = np.mean(list(pred_buffer), axis=0)
 
             confidence   = float(np.max(avg_probs))
             class_index  = int(np.argmax(avg_probs))
             predicted_cls = str(classes[class_index])
 
-            # Top-2 prediksi untuk debugging
             top2_idx = np.argsort(avg_probs)[-2:][::-1]
 
             stats = app_state["session_stats"]
@@ -260,6 +251,9 @@ async def websocket_predict(websocket: WebSocket):
                     "confidence": round(confidence, 4),
                     "message":    f"Confidence rendah ({confidence:.1%})",
                 }
+
+            if client_timestamp is not None:
+                response["timestamp"] = client_timestamp
 
             await websocket.send_text(json.dumps(response))
 
