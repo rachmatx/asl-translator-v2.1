@@ -35,8 +35,8 @@ from spellchecker import SpellChecker
 spell = SpellChecker()
 
 # ── Konfigurasi ─────────────────────────────────────────────────────────────────
-MODEL_PATH           = "model_mlp_asl.h5"
-CLASSES_PATH         = "classes.npy"
+MODEL_PATH           = "models/model_mlp_asl.h5"
+CLASSES_PATH         = "models/classes.npy"
 CONFIDENCE_THRESHOLD = 0.50   # Kirim prediksi hanya jika confidence > 50%
 INPUT_DIM            = 90     # 63 koordinat + 15 sudut + 12 jarak (sinkron dengan train.py)
 SMOOTH_BUFFER_SIZE   = 3      # Diturunkan ke 3 agar prediksi lebih responsif (G vs I)
