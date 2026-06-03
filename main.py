@@ -32,7 +32,7 @@ from tensorflow import keras
 from spellchecker import SpellChecker
 
 # ── Inisialisasi SpellChecker ───────────────────────────────────────────────────
-spell = SpellChecker()
+spell = SpellChecker(distance=1)
 
 # ── Konfigurasi ─────────────────────────────────────────────────────────────────
 MODEL_PATH           = "models/model_mlp_asl.h5"
