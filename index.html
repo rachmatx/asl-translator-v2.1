@@ -10,14 +10,14 @@
     />
     <link rel="icon" type="image/png" href="assets/icons/favicon.png" />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
-        <script
+    <script
       src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"
       crossorigin="anonymous"
     ></script>
@@ -54,7 +54,7 @@
 
       <!-- ── Main Grid ───────────────────────────────────────────────── -->
       <div class="main-grid">
-                <div class="card camera-card">
+        <div class="card camera-card">
           <div class="camera-header">
             <div style="display: flex; align-items: center">
               <button
@@ -102,7 +102,7 @@
             ></canvas>
             <div class="fps-badge" id="fpsBadge">-- FPS</div>
 
-                        <div class="prediction-overlay">
+            <div class="prediction-overlay">
               <div class="overlay-letter idle" id="overlayLetter">?</div>
               <div class="overlay-confidence">
                 <div class="confidence-bar-container">
@@ -128,8 +128,8 @@
           </div>
         </div>
 
-                <div class="side-panel">
-                    <div
+        <div class="side-panel">
+          <div
             class="card guide-card"
             id="aslGuideCard"
             style="display: none; padding: 20px"
@@ -153,7 +153,7 @@
             </div>
           </div>
 
-                    <div class="card word-card" id="wordCard">
+          <div class="card word-card" id="wordCard">
             <div class="card-label">
               <span class="material-symbols-outlined">edit_note</span> Penyusun
               Kata
@@ -200,7 +200,7 @@
             </div>
           </div>
 
-                    <div class="card stats-card" id="statsCard">
+          <div class="card stats-card" id="statsCard">
             <div class="card-label">
               <span class="material-symbols-outlined">bar_chart</span> Statistik
               Sesi
@@ -224,23 +224,23 @@
               </div>
             </div>
           </div>
-                    <div class="card log-card" id="logCard">
+          <div class="card log-card" id="logCard">
             <div class="card-label">
               <span class="material-symbols-outlined">terminal</span> Log Sistem
             </div>
             <div class="log-scroll" id="logContainer"></div>
           </div>
         </div>
-              </div>
-      
+      </div>
+
       <footer>
         Dibangun dengan
         <span>MediaPipe Hands · TensorFlow MLP · FastAPI WebSocket</span>
       </footer>
     </div>
-    
-        <div id="flashcardOverlay" class="flashcard-overlay">
-            <div class="flashcard-timer">
+
+    <div id="flashcardOverlay" class="flashcard-overlay">
+      <div class="flashcard-timer">
         <span class="material-symbols-outlined">timer</span>
         <span id="flashTimer">60</span>s
       </div>
@@ -321,7 +321,7 @@
       </div>
     </div>
 
-        <div
+    <div
       id="achievementsModal"
       class="flashcard-overlay"
       style="
@@ -363,7 +363,7 @@
             text-align: left;
           "
         >
-                    <div id="badge-speedster" class="badge-item badge-locked">
+          <div id="badge-speedster" class="badge-item badge-locked">
             <div class="badge-icon">
               <span class="material-symbols-outlined">bolt</span>
             </div>
@@ -375,7 +375,7 @@
             </div>
           </div>
 
-                    <div id="badge-marathon" class="badge-item badge-locked">
+          <div id="badge-marathon" class="badge-item badge-locked">
             <div class="badge-icon">
               <span class="material-symbols-outlined">directions_run</span>
             </div>
@@ -387,7 +387,7 @@
             </div>
           </div>
 
-                    <div id="badge-scholar" class="badge-item badge-locked">
+          <div id="badge-scholar" class="badge-item badge-locked">
             <div class="badge-icon">
               <span class="material-symbols-outlined">school</span>
             </div>
@@ -410,7 +410,7 @@
       </div>
     </div>
 
-        <div id="toastNotification" class="toast-notification">
+    <div id="toastNotification" class="toast-notification">
       <div class="toast-icon">🏆</div>
       <div class="toast-content">
         <div class="toast-title">Pencapaian Terbuka!</div>
@@ -639,7 +639,7 @@
 
                   if (challengeIndex >= challengeWord.length) {
                     const timeTaken = Date.now() - wordStartTime;
-                    if (timeTaken <= 10000) {
+                    if (timeTaken <= 5000) {
                       unlockAchievement("speedster");
                     }
 
@@ -670,8 +670,7 @@
                   document.getElementById("flashStreak").textContent = "0";
                 }
               }
-            }
-            else if (flashActive) {
+            } else if (flashActive) {
               if (prediction === flashTarget) {
                 flashCorrectFrames++;
                 flashWrongFrames = 0;
@@ -1235,7 +1234,7 @@
         [20, 0],
       ];
 
-            function computeAngleFeatures(pts) {
+      function computeAngleFeatures(pts) {
         function vecAngle(ai, bi, ci) {
           const v1x = pts[ai].x - pts[bi].x,
             v1y = pts[ai].y - pts[bi].y,
@@ -1251,7 +1250,7 @@
         return ANGLE_TRIPLETS.map(([a, b, c]) => vecAngle(a, b, c));
       }
 
-            function computeDistanceFeatures(coords) {
+      function computeDistanceFeatures(coords) {
         const pts = [];
         for (let i = 0; i < 63; i += 3) {
           pts.push({ x: coords[i], y: coords[i + 1], z: coords[i + 2] });
@@ -1264,7 +1263,7 @@
         });
       }
 
-            function alignRotation(pts) {
+      function alignRotation(pts) {
         const mag_f =
           Math.sqrt(pts[5].x ** 2 + pts[5].y ** 2 + pts[5].z ** 2) + 1e-8;
         const ux = pts[5].x / mag_f,
@@ -1306,7 +1305,6 @@
 
         canvasCtx.save();
         canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
 
         if (
           results.multiHandLandmarks &&
