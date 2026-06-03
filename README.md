@@ -294,13 +294,16 @@ asl-dump-hibrid/
 │   └── design.md           # Spesifikasi desain sistem & tema
 │
 ├── assets/                 # Aset frontend (CSS, JS, ikon, gambar)
+│   └── styles/             # Berkas gaya dan skrip UI (CSS, JS)
+│
+├── models/                 # Artefak model hasil pelatihan
+│   ├── model_mlp_asl.h5    # Berkas model biner
+│   └── classes.npy         # Mapping kelas untuk huruf keluaran
 │
 ├── main.py                 # Backend API FastAPI, WebSocket Classifier, & melayani frontend
 ├── index.html              # Aplikasi antarmuka web utama (Penerjemah, TTS, Flashcard)
 ├── Dockerfile              # Konfigurasi container untuk mempermudah deployment
 ├── requirements.txt        # Daftar library Python yang wajib diinstal
-├── model_mlp_asl.h5        # Berkas model biner hasil pelatihan
-├── classes.npy             # Mapping kelas biner NumPy untuk huruf keluaran
 └── README.md               # Dokumentasi proyek (berkas ini)
 ```
 
