@@ -8,8 +8,7 @@
 }
 
 :root {
-  /* GitHub Dark Theme */
-  --bg-deep:   #0D1117;
+    --bg-deep:   #0D1117;
   --bg-card:   #161B22;
   --bg-glass:  #1F2328;
   --border:    #374151;
@@ -21,15 +20,12 @@
   --warning:   #D29922;
   --text-1:    #FFFFFF;
   --text-2:    #C9D1D9;
-  /* Timer colors */
-  --timer-normal:  #1F2328;
+    --timer-normal:  #1F2328;
   --timer-warning: #D29922;
   --timer-danger:  #F85149;
-  /* Achievement modal icon states */
-  --achievement-unlocked: #08872B;
+    --achievement-unlocked: #08872B;
   --achievement-locked:   #30363D;
-  /* Modal surface */
-  --bg-modal:  #161B22;
+    --bg-modal:  #161B22;
   --border-modal: 1px solid #374151;
   --text-3: #8B949E;
   --radius-lg: 12px;
@@ -44,8 +40,7 @@
 }
 
 body.theme-clean {
-  /* Clean Minimalist */
-  --bg-deep: #f8fafc;
+    --bg-deep: #f8fafc;
   --bg-card: #ffffff;
   --bg-glass: #ffffff;
   --border: #e2e8f0;
@@ -69,8 +64,7 @@ body.theme-clean {
 }
 
 body.theme-neobrutalism {
-  /* Neobrutalism - Eye-catching Soft Pastel Palette */
-  --neo-bg-base: #fdfbf7;
+    --neo-bg-base: #fdfbf7;
   --neo-bg-surface: #ffffff;
   --neo-text-main: #000000;
   --neo-btn-primary: #b4a0ff;
@@ -103,7 +97,6 @@ body.theme-neobrutalism {
   --font-size-base: 14px;
 }
 
-/* Core Layouts */
 html,
 body {
   height: 100%;
@@ -117,7 +110,6 @@ body {
     color 0.3s ease;
 }
 
-/* Base specific background effects only apply to default theme */
 body:not(.theme-clean):not(.theme-neobrutalism)::before {
   display: none;
 }
@@ -142,8 +134,7 @@ header {
   margin-top: 20px;
 }
 footer {
-  margin-top: auto; /* Push to bottom */
-  padding-top: 24px;
+  margin-top: auto;   padding-top: 24px;
   text-align: center;
   font-size: 13px;
   color: var(--text-2);
@@ -481,7 +472,6 @@ body.theme-clean .overlay-confidence {
   color: var(--text-2);
   font-weight: 600;
 }
-/* Neobrutalism override */
 body.theme-neobrutalism .stat-value {
   color: #000000;
 }
@@ -489,7 +479,6 @@ body.theme-neobrutalism .stat-label {
   color: #000000;
   opacity: 0.6;
 }
-/* Clean override */
 body.theme-clean .stat-value {
   color: var(--text-1);
 }
@@ -610,7 +599,6 @@ body.theme-neobrutalism .btn:active {
   box-shadow: 0 0 0 0 var(--border);
 }
 
-/* Eye-catching Soft Pastel Neobrutalism Cards */
 body.theme-neobrutalism .camera-card {
   background: #ffe259 !important;
   color: #000000;
@@ -705,7 +693,6 @@ body.theme-neobrutalism .neo-btn-info {
   color: #000000;
 }
 
-/* Specific Buttons Override for Neobrutalism */
 body.theme-neobrutalism #btnToggleCamera.start {
   background: var(--neo-btn-success) !important;
   color: #000000 !important;
@@ -739,7 +726,6 @@ body.theme-neobrutalism #btnWordChallenge {
   color: #000000 !important;
 }
 
-/* Overlay Buttons Override for Neobrutalism */
 body.theme-neobrutalism #btnFlashcardHint {
   background: var(--neo-btn-success) !important;
   color: #000000 !important;
@@ -794,7 +780,6 @@ body.theme-neobrutalism .btn.stop {
   color: #000000;
 }
 
-/* Nyalakan Kamera (Green) */
 .btn.start {
   background: color-mix(in srgb, var(--success) 15%, transparent);
   color: var(--success);
@@ -908,8 +893,7 @@ body.theme-clean #progress-bar {
 
 #progress-fill {
   height: 100%;
-  min-width: 6px; /* Always visible even at 0% */
-  width: 0%;
+  min-width: 6px;   width: 0%;
   background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
   border-radius: inherit;
   transition: width 0.15s linear;
@@ -998,7 +982,6 @@ body.theme-neobrutalism .theme-btn.active {
   animation-delay: 0.15s;
 }
 
-/* Dashboard links */
 .nav-links {
   position: absolute;
   top: 20px;
@@ -1064,9 +1047,7 @@ body.theme-neobrutalism .nav-link.active {
   justify-content: center;
   flex-direction: column;
   gap: 24px;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-}
+  }
 body.theme-clean .flashcard-overlay {
   background: rgba(248, 250, 252, 1);
   backdrop-filter: none;
@@ -1079,12 +1060,9 @@ body.theme-neobrutalism .flashcard-overlay {
   -webkit-backdrop-filter: none;
 }
 
-/* Peek mode when user asks for a hint */
 .flashcard-overlay.peek-mode {
   background: color-mix(in srgb, var(--bg-deep) 10%, transparent) !important;
-  backdrop-filter: blur(2px) !important;
-  -webkit-backdrop-filter: blur(2px) !important;
-}
+  }
 body.theme-clean .flashcard-overlay.peek-mode {
   background: rgba(248, 250, 252, 0.1) !important;
 }
@@ -1243,8 +1221,7 @@ body.theme-neobrutalism .flashcard-btn-stop {
   transition: var(--transition);
 }
 body.theme-neobrutalism .guide-card {
-  background: #ffde59 !important; /* Yellow */
-}
+  background: #ffde59 !important; }
 .guide-image-container {
   width: 90%;
   margin: 0 auto;
@@ -1272,7 +1249,6 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   overflow: hidden;
 }
 
-/* Mobile responsive layout fixes */
 @media (max-width: 768px) {
   .prediction-overlay {
     bottom: 10px !important;
@@ -1357,8 +1333,7 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   height: 100%;
   background: var(--success);
   border-radius: 7px;
-  /* Use linear for real-time smoothness, NOT ease */
-  transition: width 0.15s linear;
+    transition: width 0.15s linear;
   width: 0%;
 }
 .confidence-value {
@@ -1408,8 +1383,7 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   pointer-events: none;
   z-index: 3;
   opacity: 1;
-  /* Use opacity for zero layout cost during toggle */
-  transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease;
 }
 .hand-guide-box {
   width: 38%;
@@ -1458,7 +1432,6 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   letter-spacing: 0.1em;
   margin: 0;
 }
-/* Neobrutalism: make corners more visible on light bg */
 body.theme-neobrutalism .guide-corner {
   border-color: rgba(0, 0, 0, 0.25);
 }
@@ -1499,7 +1472,6 @@ body.theme-neobrutalism .status-badge {
   animation: none;
 }
 
-/* CPU-friendly animation: opacity only, NOT transform or scale */
 @keyframes pulse-opacity {
   0%,
   100% {
@@ -1552,7 +1524,6 @@ body.theme-neobrutalism .status-badge {
   color: var(--text-2);
 }
 
-/* Neobrutalism */
 body.theme-neobrutalism .log-entry {
   border-bottom-color: #000;
 }
@@ -1668,8 +1639,7 @@ body.theme-neobrutalism .letter-history {
   background: color-mix(in srgb, var(--text-1) 10%, transparent);
   color: var(--text-1);
   line-height: 1.5;
-  transition: none; /* no animation — performance */
-}
+  transition: none; }
 .letter-chip:last-child {
   background: color-mix(in srgb, var(--accent-1) 30%, transparent);
   color: var(--accent-1);
@@ -1700,8 +1670,7 @@ body.theme-neobrutalism .letter-chip:last-child {
 
 /* ── Task 2: Confusion Matrix Empty State ──────────────────────── */
 #matrixCaptureArea {
-  position: relative; /* needed for overlay positioning */
-}
+  position: relative; }
 .matrix-empty {
   position: absolute;
   inset: 0;
@@ -1732,7 +1701,6 @@ body.theme-neobrutalism .letter-chip:last-child {
   margin: 0;
   line-height: 1.6;
 }
-/* Hide when data is present */
 .matrix-empty.has-data {
   display: none;
 }
@@ -1748,8 +1716,7 @@ body.theme-neobrutalism .confidence-value {
 }
 
 body.theme-neobrutalism #kontrolKoleksiCard {
-  background: #00bfff !important; /* Biru laut */
-}
+  background: #00bfff !important; }
 
 /* ── Word Challenge Styles ─────────────────────────────────────── */
 .word-challenge-container {
@@ -1780,7 +1747,7 @@ body.theme-neobrutalism #kontrolKoleksiCard {
   opacity: 1;
   border-bottom-color: var(--success);
   transform: scale(1);
-  text-shadow: 0 0 15px color-mix(in srgb, var(--success) 60%, transparent);
+  text-shadow: none;
 }
 body.theme-clean .challenge-letter {
   color: var(--text-3);
@@ -1841,7 +1808,7 @@ body.theme-neobrutalism .challenge-letter.done {
   border-color: var(--achievement-unlocked);
   opacity: 1;
   filter: none;
-  box-shadow: 0 4px 15px color-mix(in srgb, var(--achievement-unlocked) 15%, transparent);
+  box-shadow: none;
 }
 .badge-icon {
   font-size: 32px;
@@ -1874,7 +1841,7 @@ body.theme-neobrutalism .challenge-letter.done {
 }
 .badge-unlocked .badge-title {
   color: var(--achievement-unlocked);
-  text-shadow: 0 0 10px color-mix(in srgb, var(--achievement-unlocked) 50%, transparent);
+  text-shadow: none;
 }
 .badge-desc {
   font-size: 0.85rem;
@@ -1897,7 +1864,6 @@ body.theme-neobrutalism .badge-locked .badge-icon {
   color: #555;
 }
 
-/* Toast Notification */
 .toast-notification {
   position: fixed;
   bottom: -100px;

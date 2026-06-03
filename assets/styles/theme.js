@@ -1,10 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if we are on the main detector page
   const isIndex = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
   
 
 
-  // Inject Theme Switcher UI into the DOM
   let themeSwitcherHTML = `<div class="theme-switcher">`;
   if (isIndex) {
     themeSwitcherHTML += `<button class="theme-btn" id="devToggleBtn" style="border-right: 2px solid var(--border); margin-right: 4px; padding-right: 12px; border-radius: 0; display: flex; align-items: center; gap: 4px;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Dev Mode</button>`;
@@ -16,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   `;
   
-  // Create wrapper to easily append
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = themeSwitcherHTML.trim();
   const themeNode = tempDiv.firstChild;
@@ -31,7 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const buttons = document.querySelectorAll('.theme-btn:not(#devToggleBtn)');
   const savedTheme = localStorage.getItem('asl-theme') || 'default';
 
-  // Apply initial theme
   applyTheme(savedTheme);
 
   buttons.forEach(btn => {
@@ -43,15 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function applyTheme(theme) {
-    // Remove all theme classes first
     document.body.classList.remove('theme-clean', 'theme-neobrutalism');
     
-    // Add the new theme class if it's not the default
     if (theme !== 'default') {
       document.body.classList.add(theme);
     }
     
-    // Update active state on theme buttons
     buttons.forEach(btn => {
       if (btn.getAttribute('data-theme') === theme) {
         btn.classList.add('active');
@@ -60,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Update guide image based on theme
     const guideImage = document.getElementById('aslGuideImage');
     if (guideImage) {
       if (theme === 'theme-clean') {
@@ -68,13 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (theme === 'theme-neobrutalism') {
         guideImage.src = '/assets/img/panduan-asl neobrutalism.jpg';
       } else {
-        // default or dark
         guideImage.src = '/assets/img/panduan-asl dark modern.jpg';
       }
     }
   }
 
-  // --- Developer Mode Toggle Logic (Only for index.html) ---
   if (isIndex) {
     const devToggleBtn = document.getElementById('devToggleBtn');
     
@@ -98,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     
-    // Default is false (User Mode)
     const devModeSaved = localStorage.getItem('asl-dev-mode') === 'true';
     let isDevMode = devModeSaved;
     setDevMode(isDevMode);
