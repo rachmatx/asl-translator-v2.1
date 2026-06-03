@@ -36,14 +36,16 @@
       crossorigin="anonymous"
     ></script>
 
-    <link rel="stylesheet" href="assets/theme.css" />
-    <script src="assets/theme.js"></script>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="assets/styles/theme.css" />
+    <script src="assets/styles/theme.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
   </head>
 
   <body>
     <div class="app-wrapper">
-
       <!-- ── Header ─────────────────────────────────────────────────── -->
       <header>
         <h1>Detektor Bahasa Isyarat ASL</h1>
@@ -61,11 +63,7 @@
               <button
                 id="btnToggleCamera"
                 class="btn stop"
-                style="
-                  padding: 6px 12px;
-                  font-size: 12px;
-                  border-radius: 6px;
-                "
+                style="padding: 6px 12px; font-size: 12px; border-radius: 6px"
               >
                 Matikan Kamera
               </button>
@@ -77,18 +75,34 @@
 
           <div class="video-wrapper">
             <div class="camera-placeholder" id="cameraPlaceholder">
-              <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" 
-                   viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.25)" 
-                   stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M23 7 16 12 23 17V7z"/>
-                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="56"
+                height="56"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgba(255,255,255,0.25)"
+                stroke-width="1.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M23 7 16 12 23 17V7z" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
               </svg>
               <p>Kamera belum aktif</p>
               <span>Tekan tombol untuk memulai</span>
             </div>
             <video id="videoElement" autoplay muted playsinline></video>
             <canvas id="outputCanvas"></canvas>
-            <canvas id="fxCanvas" style="position: absolute; inset: 0; pointer-events: none; z-index: 10;"></canvas>
+            <canvas
+              id="fxCanvas"
+              style="
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                z-index: 10;
+              "
+            ></canvas>
             <div class="fps-badge" id="fpsBadge">-- FPS</div>
 
             <!-- Overlay prediction -->
@@ -99,7 +113,9 @@
                   <span class="confidence-label">CONFIDENCE</span>
                   <div class="confidence-track">
                     <div class="confidence-fill" id="confidenceFill"></div>
-                    <span class="confidence-value" id="confidenceValue">0%</span>
+                    <span class="confidence-value" id="confidenceValue"
+                      >0%</span
+                    >
                   </div>
                 </div>
               </div>
@@ -118,15 +134,16 @@
 
         <!-- Right: Side Panel -->
         <div class="side-panel">
-
-
           <!-- ASL Reference Guide (Visible only in User Mode) -->
           <div
             class="card guide-card"
             id="aslGuideCard"
             style="display: none; padding: 20px"
           >
-            <div class="card-label"><span class="material-symbols-outlined">menu_book</span> Panduan Alfabet ASL</div>
+            <div class="card-label">
+              <span class="material-symbols-outlined">menu_book</span> Panduan
+              Alfabet ASL
+            </div>
             <div class="guide-image-container">
               <img
                 id="aslGuideImage"
@@ -144,8 +161,15 @@
 
           <!-- Word Builder -->
           <div class="card word-card" id="wordCard">
-            <div class="card-label"><span class="material-symbols-outlined">edit_note</span> Penyusun Kata</div>
-            <div class="letter-history" id="letterHistory" aria-label="Riwayat huruf terdeteksi"></div>
+            <div class="card-label">
+              <span class="material-symbols-outlined">edit_note</span> Penyusun
+              Kata
+            </div>
+            <div
+              class="letter-history"
+              id="letterHistory"
+              aria-label="Riwayat huruf terdeteksi"
+            ></div>
             <div class="word-display">
               <span id="builtWord"></span><span class="cursor-blink"></span>
             </div>
@@ -171,15 +195,24 @@
               <button class="btn" id="btnFlashcard" onclick="startFlashcard()">
                 <span class="material-symbols-outlined">style</span> Latihan
               </button>
-              <button class="btn" id="btnWordChallenge" onclick="startWordChallenge()" title="Main tebak kata">
-                <span class="material-symbols-outlined">extension</span> Tantangan Kata
+              <button
+                class="btn"
+                id="btnWordChallenge"
+                onclick="startWordChallenge()"
+                title="Main tebak kata"
+              >
+                <span class="material-symbols-outlined">extension</span>
+                Tantangan Kata
               </button>
             </div>
           </div>
 
           <!-- Stats -->
           <div class="card stats-card" id="statsCard">
-            <div class="card-label"><span class="material-symbols-outlined">bar_chart</span> Statistik Sesi</div>
+            <div class="card-label">
+              <span class="material-symbols-outlined">bar_chart</span> Statistik
+              Sesi
+            </div>
             <div class="stats-grid">
               <div class="stat-item">
                 <div class="stat-value" id="statDetections">0</div>
@@ -195,13 +228,15 @@
               </div>
               <div class="stat-item">
                 <div class="stat-value" id="statLatency">—</div>
-                <div class="stat-label">Rata-rata Akurasi</div>
+                <div class="stat-label">Latensi Model</div>
               </div>
             </div>
           </div>
           <!-- Log -->
           <div class="card log-card" id="logCard">
-            <div class="card-label"><span class="material-symbols-outlined">terminal</span> Log Sistem</div>
+            <div class="card-label">
+              <span class="material-symbols-outlined">terminal</span> Log Sistem
+            </div>
             <div class="log-scroll" id="logContainer"></div>
           </div>
         </div>
@@ -219,18 +254,52 @@
     <!-- Modal Flashcard -->
     <div id="flashcardOverlay" class="flashcard-overlay">
       <!-- Timer Display -->
-      <div class="flashcard-timer"><span class="material-symbols-outlined">timer</span> <span id="flashTimer">60</span>s</div>
+      <div class="flashcard-timer">
+        <span class="material-symbols-outlined">timer</span>
+        <span id="flashTimer">60</span>s
+      </div>
 
-      <div style="text-align: center;">
+      <div style="text-align: center">
         <div class="flashcard-label" id="flashTitle">Tunjukkan huruf ini:</div>
         <div id="flashTarget" class="flashcard-target">A</div>
-        <div id="wordChallengeTarget" class="word-challenge-container" style="display: none;"></div>
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-          <button class="btn" id="btnFlashcardHint" onclick="peekFlashcardHint()" style="font-size: 14px; padding: 8px 16px; flex: 1;">
-            <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility</span> Intip (3s)
+        <div
+          id="wordChallengeTarget"
+          class="word-challenge-container"
+          style="display: none"
+        ></div>
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+          "
+        >
+          <button
+            class="btn"
+            id="btnFlashcardHint"
+            onclick="peekFlashcardHint()"
+            style="font-size: 14px; padding: 8px 16px; flex: 1"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 18px; vertical-align: bottom"
+              >visibility</span
+            >
+            Intip (3s)
           </button>
-          <button class="btn" id="btnAchievements" onclick="openAchievementsModal()" style="font-size: 14px; padding: 8px 16px; flex: 1;">
-            <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">emoji_events</span> Pencapaian
+          <button
+            class="btn"
+            id="btnAchievements"
+            onclick="openAchievementsModal()"
+            style="font-size: 14px; padding: 8px 16px; flex: 1"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="font-size: 18px; vertical-align: bottom"
+              >emoji_events</span
+            >
+            Pencapaian
           </button>
         </div>
       </div>
@@ -244,7 +313,12 @@
 
       <div class="flashcard-stats-row">
         <span>Skor: <strong id="flashScore">0</strong></span>
-        <span>Beruntun: <strong id="flashStreak">0</strong><span class="material-symbols-outlined">local_fire_department</span></span>
+        <span
+          >Beruntun: <strong id="flashStreak">0</strong
+          ><span class="material-symbols-outlined"
+            >local_fire_department</span
+          ></span
+        >
         <span>Total: <strong id="flashTotal">0</strong></span>
       </div>
 
@@ -262,40 +336,95 @@
     </div>
 
     <!-- Modal Pencapaian (Achievements) -->
-    <div id="achievementsModal" class="flashcard-overlay" style="display: none; align-items: center; justify-content: center; z-index: 2000;">
-      <div class="achievements-container" style="background: var(--bg-card); padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; border: 2px solid var(--border);">
-        <h2 style="margin-bottom: 15px; font-size: 1.5rem; color: var(--text-1); font-family: var(--font-display);">🏆 Pencapaian</h2>
-        
-        <div class="achievements-grid" style="display: flex; flex-direction: column; gap: 15px; text-align: left;">
+    <div
+      id="achievementsModal"
+      class="flashcard-overlay"
+      style="
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      "
+    >
+      <div
+        class="achievements-container"
+        style="
+          background: var(--bg-card);
+          padding: 20px;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 400px;
+          text-align: center;
+          border: 2px solid var(--border);
+        "
+      >
+        <h2
+          style="
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            color: var(--text-1);
+            font-family: var(--font-display);
+          "
+        >
+          🏆 Pencapaian
+        </h2>
+
+        <div
+          class="achievements-grid"
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+          "
+        >
           <!-- Speedster -->
           <div id="badge-speedster" class="badge-item badge-locked">
-            <div class="badge-icon"><span class="material-symbols-outlined">bolt</span></div>
+            <div class="badge-icon">
+              <span class="material-symbols-outlined">bolt</span>
+            </div>
             <div class="badge-info">
               <div class="badge-title">Speedster</div>
-              <div class="badge-desc">Berhasil mengeja 1 kata dalam 3 detik.</div>
+              <div class="badge-desc">
+                Berhasil mengeja 1 kata dalam 3 detik.
+              </div>
             </div>
           </div>
-          
+
           <!-- Marathon -->
           <div id="badge-marathon" class="badge-item badge-locked">
-            <div class="badge-icon"><span class="material-symbols-outlined">directions_run</span></div>
+            <div class="badge-icon">
+              <span class="material-symbols-outlined">directions_run</span>
+            </div>
             <div class="badge-info">
               <div class="badge-title">Marathon</div>
-              <div class="badge-desc">Melakukan 50 tebakan benar di mode Latihan.</div>
+              <div class="badge-desc">
+                Melakukan 50 tebakan benar di mode Latihan.
+              </div>
             </div>
           </div>
 
           <!-- Scholar -->
           <div id="badge-scholar" class="badge-item badge-locked">
-            <div class="badge-icon"><span class="material-symbols-outlined">school</span></div>
+            <div class="badge-icon">
+              <span class="material-symbols-outlined">school</span>
+            </div>
             <div class="badge-info">
               <div class="badge-title">Scholar</div>
-              <div class="badge-desc">Menggunakan aplikasi 3 hari berturut-turut.</div>
+              <div class="badge-desc">
+                Menggunakan aplikasi 3 hari berturut-turut.
+              </div>
             </div>
           </div>
         </div>
-        
-        <button class="btn btn-danger" style="margin-top: 25px; width: 100%;" onclick="closeAchievementsModal()">Tutup</button>
+
+        <button
+          class="btn btn-danger"
+          style="margin-top: 25px; width: 100%"
+          onclick="closeAchievementsModal()"
+        >
+          Tutup
+        </button>
       </div>
     </div>
 
@@ -326,21 +455,22 @@
       const canvasCtx = canvasElement.getContext("2d");
 
       function setCameraActive(isActive) {
-        const placeholder = document.getElementById('cameraPlaceholder');
+        const placeholder = document.getElementById("cameraPlaceholder");
         if (placeholder) {
-          placeholder.style.display = isActive ? 'none' : 'flex';
+          placeholder.style.display = isActive ? "none" : "flex";
         }
       }
-      videoElement.addEventListener('playing', () => setCameraActive(true));
+      videoElement.addEventListener("playing", () => setCameraActive(true));
 
       // ═══════════════════════════════════════════════════════════════════
       //  CONFIG
       // ═══════════════════════════════════════════════════════════════════
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const WS_URL = `${protocol}//${window.location.host}/ws/predict`;
       const CONFIDENCE_THRESHOLD = 0.5; // diturunkan agar lebih peka
       const SEND_INTERVAL_MS = 40; // dikurangi jadi 40ms (25 FPS) agar lebih responsif
       const HOLD_FRAMES = 20; // dinaikkan jadi 20 frame (sekitar 0.8 detik) agar ada jeda wajar
+      const RESET_LETTER_FRAMES = 10; // cooldown reset huruf berulang (optimal: 10-15)
       const AUTO_APPEND_WORD = true; // aktifkan word builder otomatis
 
       // ═══════════════════════════════════════════════════════════════════
@@ -353,6 +483,7 @@
       let currentPrediction = null;
       let predictionHoldCount = 0;
       let lastAppendedLetter = null;
+      let resetLetterCounter = 0;
 
       let totalDetections = 0;
       let totalFramesSent = 0;
@@ -446,14 +577,29 @@
           return;
         }
 
+        // Hitung latensi sebenarnya (waktu sejak frame dikirim hingga balasan diterima)
+        const latency = Math.round(performance.now() - lastSendTime);
+        document.getElementById("statLatency").textContent = latency + "ms";
+
         const confidence = data.confidence ?? 0;
         const prediction = data.prediction; // null jika confidence rendah
         const confPct = Math.round(confidence * 100);
 
         // Update confidence bar
         const pct = Math.round(confidence * 100);
-        document.getElementById('confidenceFill').style.width = pct + '%';
-        document.getElementById('confidenceValue').textContent = pct + '%';
+        document.getElementById("confidenceFill").style.width = pct + "%";
+        document.getElementById("confidenceValue").textContent = pct + "%";
+
+        // Logic baru: Reset huruf terakhir jika prediksi != huruf terakhir secara beruntun (bahkan di frame antara/gagal)
+        if (prediction !== lastAppendedLetter && lastAppendedLetter !== null) {
+          resetLetterCounter++;
+          if (resetLetterCounter >= RESET_LETTER_FRAMES) {
+            lastAppendedLetter = null;
+            resetLetterCounter = 0;
+          }
+        } else if (prediction === lastAppendedLetter) {
+          resetLetterCounter = 0;
+        }
 
         if (prediction) {
           // ── Deteksi berhasil ────────────────────────────────────────
@@ -482,7 +628,7 @@
                   builtWord += prediction.toUpperCase();
                 }
                 // Add chip for visual history (skip 'nothing')
-                if (prediction !== 'nothing') {
+                if (prediction !== "nothing") {
                   appendLetterChip(prediction);
                 }
                 lastAppendedLetter = prediction;
@@ -495,9 +641,13 @@
           }
 
           // Flashcard & Word Challenge logic
-          if ((flashActive || wordChallengeActive) && prediction && !flashCooldown) {
+          if (
+            (flashActive || wordChallengeActive) &&
+            prediction &&
+            !flashCooldown
+          ) {
             document.getElementById("flashCurrent").textContent = prediction;
-            
+
             // Mode Tantangan Kata
             if (wordChallengeActive) {
               const targetLetter = challengeWord[challengeIndex];
@@ -507,40 +657,51 @@
                 if (flashCorrectFrames >= WORD_CHALLENGE_FRAMES) {
                   playSFX("success");
                   spawnParticles(lastHandX, lastHandY, 15, "#00e676");
-                  
+
                   // Update UI
-                  const letterSpans = document.getElementById("wordChallengeTarget").children;
-                  letterSpans[challengeIndex].className = "challenge-letter done";
-                  
+                  const letterSpans = document.getElementById(
+                    "wordChallengeTarget",
+                  ).children;
+                  letterSpans[challengeIndex].className =
+                    "challenge-letter done";
+
                   challengeIndex++;
                   flashCorrectFrames = 0;
                   flashScore++;
                   flashTotal++;
                   flashStreak++;
-                  document.getElementById("flashScore").textContent = flashScore;
-                  document.getElementById("flashStreak").textContent = flashStreak;
-                  document.getElementById("flashTotal").textContent = flashTotal;
-                  
+                  document.getElementById("flashScore").textContent =
+                    flashScore;
+                  document.getElementById("flashStreak").textContent =
+                    flashStreak;
+                  document.getElementById("flashTotal").textContent =
+                    flashTotal;
+
                   // Kata Selesai?
                   if (challengeIndex >= challengeWord.length) {
                     const timeTaken = Date.now() - wordStartTime;
                     if (timeTaken <= 3000) {
-                      unlockAchievement('speedster');
+                      unlockAchievement("speedster");
                     }
-                    
+
                     playSFX("success"); // double sound
                     spawnParticles(lastHandX, lastHandY, 50, "#ff6b9d");
                     flashCooldown = true;
                     document.getElementById("flashStatus").innerHTML =
                       '<span class="material-symbols-outlined" style="vertical-align: bottom;">celebration</span> Hebat!';
-                    
+
                     setTimeout(nextWordChallenge, 1500);
-                    setTimeout(() => { flashCooldown = false; }, 2000);
+                    setTimeout(() => {
+                      flashCooldown = false;
+                    }, 2000);
                   } else {
                     // Lanjut huruf berikutnya
-                    letterSpans[challengeIndex].className = "challenge-letter active";
+                    letterSpans[challengeIndex].className =
+                      "challenge-letter active";
                     flashCooldown = true;
-                    setTimeout(() => { flashCooldown = false; }, 500);
+                    setTimeout(() => {
+                      flashCooldown = false;
+                    }, 500);
                   }
                 }
               } else {
@@ -551,7 +712,7 @@
                   document.getElementById("flashStreak").textContent = "0";
                 }
               }
-            } 
+            }
             // Mode Flashcard Huruf Biasa
             else if (flashActive) {
               if (prediction === flashTarget) {
@@ -563,21 +724,26 @@
                   flashScore++;
                   flashStreak++;
                   flashTotal++;
-                  
+
                   // Marathon Tracking
-                  let totalCorrect = parseInt(localStorage.getItem("asl_marathon_count") || "0") + 1;
+                  let totalCorrect =
+                    parseInt(
+                      localStorage.getItem("asl_marathon_count") || "0",
+                    ) + 1;
                   localStorage.setItem("asl_marathon_count", totalCorrect);
                   if (totalCorrect >= 50) {
-                    unlockAchievement('marathon');
+                    unlockAchievement("marathon");
                   }
-                  
+
                   document.getElementById("flashStatus").innerHTML =
                     '<span class="material-symbols-outlined" style="vertical-align: bottom;">check_circle</span> Benar!';
-                  document.getElementById("flashScore").textContent = flashScore;
+                  document.getElementById("flashScore").textContent =
+                    flashScore;
                   document.getElementById("flashStreak").textContent =
                     flashStreak;
-                  document.getElementById("flashTotal").textContent = flashTotal;
-                  
+                  document.getElementById("flashTotal").textContent =
+                    flashTotal;
+
                   flashCooldown = true;
                   setTimeout(nextFlashCard, 800);
                   setTimeout(() => {
@@ -601,7 +767,8 @@
             overlayLetter.textContent = "?";
             overlayLetter.className = "overlay-letter idle";
           }
-          document.getElementById('confidenceValue').textContent = confPct + '%';
+          document.getElementById("confidenceValue").textContent =
+            confPct + "%";
           currentPrediction = null;
           predictionHoldCount = 0;
         }
@@ -618,14 +785,14 @@
       }
 
       function appendLetterChip(letter) {
-        const container = document.getElementById('letterHistory');
+        const container = document.getElementById("letterHistory");
         if (!container) return;
 
-        const chip = document.createElement('span');
-        const isSpace = (letter === 'space' || letter === ' ');
-        chip.className = 'letter-chip' + (isSpace ? ' is-space' : '');
-        chip.textContent = isSpace ? '⎵' : letter.toUpperCase();
-        chip.title = isSpace ? 'Spasi' : letter.toUpperCase();
+        const chip = document.createElement("span");
+        const isSpace = letter === "space" || letter === " ";
+        chip.className = "letter-chip" + (isSpace ? " is-space" : "");
+        chip.textContent = isSpace ? "⎵" : letter.toUpperCase();
+        chip.title = isSpace ? "Spasi" : letter.toUpperCase();
 
         container.appendChild(chip);
 
@@ -677,8 +844,8 @@
       document.getElementById("btnClear").addEventListener("click", () => {
         builtWord = "";
         updateWordDisplay();
-        const hist = document.getElementById('letterHistory');
-        if (hist) hist.innerHTML = '';
+        const hist = document.getElementById("letterHistory");
+        if (hist) hist.innerHTML = "";
         log("Kata dikosongkan", "warn");
       });
 
@@ -751,14 +918,14 @@
       let particles = [];
       let lastHandX = window.innerWidth / 2;
       let lastHandY = window.innerHeight / 2;
-      
+
       function resizeFxCanvas() {
         if (fxCanvas) {
           fxCanvas.width = fxCanvas.clientWidth || 640;
           fxCanvas.height = fxCanvas.clientHeight || 480;
         }
       }
-      window.addEventListener('resize', resizeFxCanvas);
+      window.addEventListener("resize", resizeFxCanvas);
       setTimeout(resizeFxCanvas, 1000);
 
       function spawnParticles(x, y, count = 20, primaryColor = "#00d4ff") {
@@ -770,7 +937,7 @@
             vy: (Math.random() - 0.5) * 12 - 3,
             life: 1.0,
             color: Math.random() > 0.5 ? primaryColor : "#6c63ff",
-            size: Math.random() * 6 + 3
+            size: Math.random() * 6 + 3,
           });
         }
       }
@@ -783,12 +950,12 @@
           p.y += p.vy;
           p.vy += 0.2; // gravity
           p.life -= 0.02;
-          
+
           if (p.life <= 0) {
             particles.splice(i, 1);
             continue;
           }
-          
+
           fxCtx.globalAlpha = p.life;
           fxCtx.fillStyle = p.color;
           fxCtx.beginPath();
@@ -802,19 +969,37 @@
 
       // ── Flashcard & Word Challenge Logic ────────────────────────────────────
       const ASL_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-      const WORD_LIST = ["HELLO", "WORLD", "APPLE", "SIGN", "CODE", "PEACE", "WATER", "BLUE", "HAPPY", "NICE", "MEET", "GOOD", "LOVE", "LEARN", "DEAF"];
-      
+      const WORD_LIST = [
+        "HELLO",
+        "WORLD",
+        "APPLE",
+        "SIGN",
+        "CODE",
+        "PEACE",
+        "WATER",
+        "BLUE",
+        "HAPPY",
+        "NICE",
+        "MEET",
+        "GOOD",
+        "LOVE",
+        "LEARN",
+        "DEAF",
+      ];
+
       let flashActive = false;
       let wordChallengeActive = false;
-      
+
       let flashTarget = null;
       let challengeWord = "";
       let challengeIndex = 0;
-      
-      let flashScore = 0, flashStreak = 0, flashTotal = 0;
+
+      let flashScore = 0,
+        flashStreak = 0,
+        flashTotal = 0;
       let flashCorrectFrames = 0;
       let flashWrongFrames = 0;
-      const FLASH_CORRECT_FRAMES = 10; 
+      const FLASH_CORRECT_FRAMES = 10;
       const WORD_CHALLENGE_FRAMES = 5; // Lebih mudah agar tidak lambat mengeja
       let flashCooldown = false;
 
@@ -825,14 +1010,21 @@
         flashActive = true;
         wordChallengeActive = false;
         flashTimeLeft = 60;
-        flashScore = flashStreak = flashTotal = flashCorrectFrames = flashWrongFrames = 0;
+        flashScore =
+          flashStreak =
+          flashTotal =
+          flashCorrectFrames =
+          flashWrongFrames =
+            0;
 
         document.getElementById("flashcardOverlay").style.display = "flex";
-        document.getElementById("flashTitle").textContent = "Tunjukkan huruf ini:";
+        document.getElementById("flashTitle").textContent =
+          "Tunjukkan huruf ini:";
         document.getElementById("flashTarget").style.display = "block";
         document.getElementById("wordChallengeTarget").style.display = "none";
-        document.getElementById("btnFlashcardHint").style.display = "inline-block";
-        
+        document.getElementById("btnFlashcardHint").style.display =
+          "inline-block";
+
         document.getElementById("flashScore").textContent = "0";
         document.getElementById("flashStreak").textContent = "0";
         document.getElementById("flashTotal").textContent = "0";
@@ -851,19 +1043,24 @@
         nextFlashCard();
         log("Mode Latihan dimulai!", "success");
       }
-      
+
       function startWordChallenge() {
         wordChallengeActive = true;
         flashActive = false;
         flashTimeLeft = 90; // Waktu lebih lama untuk kata
-        flashScore = flashStreak = flashTotal = flashCorrectFrames = flashWrongFrames = 0;
-        
+        flashScore =
+          flashStreak =
+          flashTotal =
+          flashCorrectFrames =
+          flashWrongFrames =
+            0;
+
         document.getElementById("flashcardOverlay").style.display = "flex";
         document.getElementById("flashTitle").textContent = "Eja kata ini:";
         document.getElementById("flashTarget").style.display = "none";
         document.getElementById("wordChallengeTarget").style.display = "flex";
         document.getElementById("btnFlashcardHint").style.display = "none"; // Sembunyikan untuk Tantangan Kata
-        
+
         document.getElementById("flashScore").textContent = "0";
         document.getElementById("flashStreak").textContent = "0";
         document.getElementById("flashTotal").textContent = "0";
@@ -874,7 +1071,7 @@
           flashTimeLeft--;
           document.getElementById("flashTimer").textContent = flashTimeLeft;
           if (flashTimeLeft <= 0) {
-            stopFlashcard(true); 
+            stopFlashcard(true);
           }
         }, 1000);
 
@@ -899,33 +1096,48 @@
       }
 
       function nextFlashCard() {
-        flashTarget = ASL_LETTERS[Math.floor(Math.random() * ASL_LETTERS.length)];
+        flashTarget =
+          ASL_LETTERS[Math.floor(Math.random() * ASL_LETTERS.length)];
         document.getElementById("flashTarget").textContent = flashTarget;
         document.getElementById("flashStatus").textContent = "";
         document.getElementById("flashCurrent").textContent = "—";
         flashCorrectFrames = 0;
         flashWrongFrames = 0;
       }
-      
+
       function peekFlashcardHint() {
         const overlay = document.getElementById("flashcardOverlay");
         const btn = document.getElementById("btnFlashcardHint");
         overlay.classList.add("peek-mode");
         btn.disabled = true;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility_off</span> Mengintip...';
-        
+        btn.innerHTML =
+          '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility_off</span> Mengintip...';
+
         setTimeout(() => {
           overlay.classList.remove("peek-mode");
           btn.disabled = false;
-          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility</span> Intip Panduan (3s)';
+          btn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-size: 18px; vertical-align: bottom;">visibility</span> Intip Panduan (3s)';
         }, 3000);
       }
-      
+
       // ── Gamification (Achievements) Logic ───────────────────────────────────
       const ACHIEVEMENTS = {
-        speedster: { id: "speedster", name: "Speedster", desc: "Berhasil mengeja 1 kata dalam 3 detik." },
-        marathon: { id: "marathon", name: "Marathon", desc: "Melakukan 50 tebakan benar di mode Latihan." },
-        scholar: { id: "scholar", name: "Scholar", desc: "Menggunakan aplikasi 3 hari berturut-turut." }
+        speedster: {
+          id: "speedster",
+          name: "Speedster",
+          desc: "Berhasil mengeja 1 kata dalam 3 detik.",
+        },
+        marathon: {
+          id: "marathon",
+          name: "Marathon",
+          desc: "Melakukan 50 tebakan benar di mode Latihan.",
+        },
+        scholar: {
+          id: "scholar",
+          name: "Scholar",
+          desc: "Menggunakan aplikasi 3 hari berturut-turut.",
+        },
       };
 
       function getUnlockedAchievements() {
@@ -937,18 +1149,24 @@
         if (!unlocked.includes(id)) {
           unlocked.push(id);
           localStorage.setItem("asl_achievements", JSON.stringify(unlocked));
-          
+
           // Show Toast
           const toast = document.getElementById("toastNotification");
-          document.getElementById("toastDesc").textContent = ACHIEVEMENTS[id].name;
+          document.getElementById("toastDesc").textContent =
+            ACHIEVEMENTS[id].name;
           toast.classList.add("show");
           playSFX("success");
-          spawnParticles(window.innerWidth / 2, window.innerHeight - 100, 40, "#FFD700");
-          
+          spawnParticles(
+            window.innerWidth / 2,
+            window.innerHeight - 100,
+            40,
+            "#FFD700",
+          );
+
           setTimeout(() => {
             toast.classList.remove("show");
           }, 4000);
-          
+
           updateAchievementsUI();
         }
       }
@@ -960,9 +1178,10 @@
           if (el) {
             if (unlocked.includes(key)) {
               el.className = "badge-item badge-unlocked";
-              const iconBox = el.querySelector('.badge-icon');
+              const iconBox = el.querySelector(".badge-icon");
               // Ganti ikon menjadi piala/bintang saat terbuka
-              iconBox.innerHTML = '<span class="material-symbols-outlined">workspace_premium</span>';
+              iconBox.innerHTML =
+                '<span class="material-symbols-outlined">workspace_premium</span>';
             } else {
               el.className = "badge-item badge-locked";
             }
@@ -982,50 +1201,52 @@
         const today = new Date().toDateString();
         let lastVisit = localStorage.getItem("asl_last_visit");
         let streak = parseInt(localStorage.getItem("asl_day_streak") || "0");
-        
+
         if (lastVisit) {
           if (lastVisit !== today) {
             const lastDate = new Date(lastVisit);
             const currDate = new Date(today);
-            const diffDays = Math.round(Math.abs((currDate - lastDate) / (1000 * 60 * 60 * 24))); 
-            
+            const diffDays = Math.round(
+              Math.abs((currDate - lastDate) / (1000 * 60 * 60 * 24)),
+            );
+
             if (diffDays === 1) {
               streak += 1;
             } else if (diffDays > 1) {
-              streak = 1; 
+              streak = 1;
             }
           }
         } else {
           streak = 1;
         }
-        
+
         localStorage.setItem("asl_last_visit", today);
         localStorage.setItem("asl_day_streak", streak);
-        
+
         if (streak >= 3) {
-          unlockAchievement('scholar');
+          unlockAchievement("scholar");
         }
       }
       // Panggil saat aplikasi dimuat
       setTimeout(checkScholar, 2000);
 
-      
       let wordStartTime = 0;
       function nextWordChallenge() {
         challengeWord = WORD_LIST[Math.floor(Math.random() * WORD_LIST.length)];
         challengeIndex = 0;
         wordStartTime = Date.now();
-        
+
         const container = document.getElementById("wordChallengeTarget");
         container.innerHTML = "";
-        
+
         for (let i = 0; i < challengeWord.length; i++) {
           const span = document.createElement("span");
           span.textContent = challengeWord[i];
-          span.className = i === 0 ? "challenge-letter active" : "challenge-letter";
+          span.className =
+            i === 0 ? "challenge-letter active" : "challenge-letter";
           container.appendChild(span);
         }
-        
+
         document.getElementById("flashStatus").textContent = "";
         document.getElementById("flashCurrent").textContent = "—";
         flashCorrectFrames = 0;
@@ -1238,17 +1459,17 @@
             for (const pt of rotated) {
               // Hapus coords_flipped! Gunakan `features` murni.
               // Karena coords_flipped (X terbalik) merusak pose asimetris seperti 'G' dan 'H'.
-              coords.push(
-                pt.x / scale,
-                pt.y / scale,
-                pt.z / scale,
-              );
+              coords.push(pt.x / scale, pt.y / scale, pt.z / scale);
             }
 
             // Hitung sudut dan jarak menggunakan coords yang sudah benar secara kiralitas
             const coordPts = [];
             for (let i = 0; i < 63; i += 3) {
-              coordPts.push({ x: coords[i], y: coords[i + 1], z: coords[i + 2] });
+              coordPts.push({
+                x: coords[i],
+                y: coords[i + 1],
+                z: coords[i + 2],
+              });
             }
             const angles = computeAngleFeatures(coordPts);
 
@@ -1293,11 +1514,11 @@
 
         // ── Hand placement guide visibility ──
         // Uses opacity (not display) to avoid layout recalculation
-        const handGuideEl = document.getElementById('handGuide');
+        const handGuideEl = document.getElementById("handGuide");
         if (handGuideEl) {
-          const handVisible = results.multiHandLandmarks && 
-                              results.multiHandLandmarks.length > 0;
-          handGuideEl.style.opacity = handVisible ? '0' : '1';
+          const handVisible =
+            results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
+          handGuideEl.style.opacity = handVisible ? "0" : "1";
         }
 
         canvasCtx.restore();
@@ -1311,14 +1532,9 @@
           elapsed >= SEND_INTERVAL_MS
         ) {
           lastSendTime = performance.now();
-          const sendStart = performance.now();
           ws.send(JSON.stringify(currentLandmarks));
           totalFramesSent++;
           document.getElementById("statFrames").textContent = totalFramesSent;
-
-          // Estimasi latensi (round-trip kasar)
-          const latency = Math.round(performance.now() - sendStart);
-          document.getElementById("statLatency").textContent = latency + "ms";
         }
       }
 

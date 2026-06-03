@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     themeSwitcherHTML += `<button class="theme-btn" id="devToggleBtn" style="border-right: 2px solid var(--border); margin-right: 4px; padding-right: 12px; border-radius: 0; display: flex; align-items: center; gap: 4px;"><span class="material-symbols-outlined" style="font-size: 16px;">build</span> Dev Mode</button>`;
   }
   themeSwitcherHTML += `
-      <button class="theme-btn" data-theme="default">Glassy</button>
+      <button class="theme-btn" data-theme="default">Dark</button>
       <button class="theme-btn" data-theme="theme-clean">Clean</button>
       <button class="theme-btn" data-theme="theme-neobrutalism">Brutal</button>
     </div>
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (theme === 'theme-neobrutalism') {
         guideImage.src = '/assets/img/panduan-asl neobrutalism.jpg';
       } else {
-        // default or glassy
+        // default or dark
         guideImage.src = '/assets/img/panduan-asl dark modern.jpg';
       }
     }

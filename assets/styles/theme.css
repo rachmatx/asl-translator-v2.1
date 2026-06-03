@@ -8,23 +8,34 @@
 }
 
 :root {
-  /* Modern Glassy (Default) */
-  --bg-deep: #050810;
-  --bg-card: #0d1117;
-  --bg-glass: rgba(255, 255, 255, 0.04);
-  --border: rgba(255, 255, 255, 0.08);
-  --accent-1: #6c63ff;
-  --accent-2: #00d4ff;
-  --accent-3: #ff6b9d;
-  --success: #00e676;
-  --warning: #ffab40;
-  --text-1: #f0f4ff;
-  --text-2: #8892a4;
-  --text-3: #4a5568;
-  --radius-lg: 20px;
-  --radius-md: 12px;
-  --radius-sm: 8px;
-  --shadow-glow: 0 0 40px rgba(108, 99, 255, 0.25);
+  /* GitHub Dark Theme */
+  --bg-deep:   #0D1117;
+  --bg-card:   #161B22;
+  --bg-glass:  #1F2328;
+  --border:    #374151;
+  --accent-1:  #8DD6FF;
+  --accent-2:  #58A6FF;
+  --accent-3:  #388BFD;
+  --success:   #08872B;
+  --accent-muted: #0AA334;
+  --warning:   #D29922;
+  --text-1:    #FFFFFF;
+  --text-2:    #C9D1D9;
+  /* Timer colors */
+  --timer-normal:  #1F2328;
+  --timer-warning: #D29922;
+  --timer-danger:  #F85149;
+  /* Achievement modal icon states */
+  --achievement-unlocked: #08872B;
+  --achievement-locked:   #30363D;
+  /* Modal surface */
+  --bg-modal:  #161B22;
+  --border-modal: 1px solid #374151;
+  --text-3: #8B949E;
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --shadow-glow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --font-body: "Inter", sans-serif;
   --font-display: "Space Grotesk", sans-serif;
@@ -59,15 +70,15 @@ body.theme-clean {
 
 body.theme-neobrutalism {
   /* Neobrutalism - Eye-catching Soft Pastel Palette */
-  --neo-bg-base: #FDFBF7;
-  --neo-bg-surface: #FFFFFF;
+  --neo-bg-base: #fdfbf7;
+  --neo-bg-surface: #ffffff;
   --neo-text-main: #000000;
-  --neo-btn-primary: #B4A0FF;
-  --neo-btn-secondary: #FFFFFF;
-  --neo-btn-success: #82E0AA;
-  --neo-btn-warning: #FFD166;
-  --neo-btn-danger: #FF6B6B;
-  --neo-btn-info: #48CAE4;
+  --neo-btn-primary: #b4a0ff;
+  --neo-btn-secondary: #ffffff;
+  --neo-btn-success: #82e0aa;
+  --neo-btn-warning: #ffd166;
+  --neo-btn-danger: #ff6b6b;
+  --neo-btn-info: #48cae4;
 
   --bg-deep: var(--neo-bg-base);
   --bg-card: var(--neo-bg-surface);
@@ -92,8 +103,6 @@ body.theme-neobrutalism {
   --font-size-base: 14px;
 }
 
-
-
 /* Core Layouts */
 html,
 body {
@@ -110,38 +119,10 @@ body {
 
 /* Base specific background effects only apply to default theme */
 body:not(.theme-clean):not(.theme-neobrutalism)::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(
-      ellipse 80% 60% at 20% 10%,
-      rgba(108, 99, 255, 0.12) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 60% 50% at 80% 90%,
-      rgba(0, 212, 255, 0.08) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 50% 40% at 50% 50%,
-      rgba(255, 107, 157, 0.05) 0%,
-      transparent 70%
-    );
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 body:not(.theme-clean):not(.theme-neobrutalism)::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(108, 99, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(108, 99, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 .app-wrapper {
@@ -187,15 +168,14 @@ body.theme-neobrutalism footer span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(108, 99, 255, 0.15);
-  border: 1px solid rgba(108, 99, 255, 0.3);
-  border-radius: 100px;
-  padding: 4px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #a78bfa;
+  background: #1F2328;
+  border: 1px solid #30363D;
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: #C9D1D9;
   margin-bottom: 14px;
 }
 body.theme-clean .header-badge {
@@ -238,10 +218,8 @@ h1 {
   line-height: 1.15;
 }
 body:not(.theme-clean):not(.theme-neobrutalism) h1 {
-  background: linear-gradient(135deg, #f0f4ff 0%, #a78bfa 50%, #00d4ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  color: var(--text-1);
 }
 .subtitle {
   margin-top: 8px;
@@ -283,11 +261,10 @@ body.theme-stats .main-grid {
 }
 
 .card {
-  background: var(--bg-glass);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-glow);
   overflow: hidden;
   transition: var(--transition);
 }
@@ -301,8 +278,8 @@ body.theme-clean .card {
   backdrop-filter: none;
 }
 body:not(.theme-clean):not(.theme-neobrutalism) .card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  border-color: color-mix(in srgb, var(--accent-1) 50%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent-1) 15%, transparent);
 }
 
 .camera-header {
@@ -331,7 +308,7 @@ body.theme-neobrutalism .camera-header {
   border-radius: 100px;
   font-size: 11px;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--text-1) 6%, transparent);
   border: 1px solid var(--border);
   transition: var(--transition);
 }
@@ -342,18 +319,18 @@ body.theme-neobrutalism .status-pill {
   background: #fff;
 }
 .status-pill.connected {
-  background: rgba(0, 230, 118, 0.1);
-  border-color: rgba(0, 230, 118, 0.3);
+  background: rgba(8, 135, 43, 0.1);
+  border-color: rgba(8, 135, 43, 0.4);
   color: var(--success);
 }
 .status-pill.disconnected {
-  background: rgba(255, 107, 107, 0.1);
-  border-color: rgba(255, 107, 107, 0.3);
+  background: color-mix(in srgb, var(--accent-3) 10%, transparent);
+  border-color: color-mix(in srgb, var(--accent-3) 30%, transparent);
   color: var(--warning);
 }
 .status-pill.connecting {
-  background: rgba(255, 171, 64, 0.1);
-  border-color: rgba(255, 171, 64, 0.3);
+  background: color-mix(in srgb, var(--warning) 10%, transparent);
+  border-color: color-mix(in srgb, var(--warning) 30%, transparent);
   color: var(--warning);
 }
 .status-indicator {
@@ -397,8 +374,8 @@ body.theme-neobrutalism .video-wrapper {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
+  background: color-mix(in srgb, var(--bg-deep) 50%, transparent);
+  color: var(--text-1);
   padding: 4px 8px;
   border-radius: var(--radius-sm);
   font-size: 11px;
@@ -428,10 +405,9 @@ body.theme-neobrutalism .fps-badge {
   font-weight: 800;
   font-family: var(--font-display);
   line-height: 1;
-  background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 4px 10px rgba(108, 99, 255, 0.5));
+  color: #ffffff;
+  background: none;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
   transition: var(--transition);
 }
 body.theme-clean .overlay-letter,
@@ -441,15 +417,10 @@ body.theme-neobrutalism .overlay-letter {
   -webkit-background-clip: border-box;
   filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 1));
 }
-.overlay-letter.idle {
-  background: var(--text-3);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: none;
-}
+
 .overlay-confidence {
-  background: rgba(5, 8, 16, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--bg-deep) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-1) 20%, transparent);
   padding: 6px 12px;
   border-radius: 100px;
   backdrop-filter: blur(8px);
@@ -533,7 +504,7 @@ body.theme-clean .stat-value {
   height: 160px;
   margin: 0 auto 12px;
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--text-1) 3%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -553,10 +524,9 @@ body.theme-clean .big-letter-display {
   font-size: 100px;
   font-weight: 800;
   font-family: var(--font-display);
-  background: linear-gradient(135deg, #00d4ff, #6c63ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 20px rgba(108, 99, 255, 0.3));
+  color: #ffffff;
+  background: none;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
 }
 body.theme-neobrutalism #mainPrediction,
 body.theme-clean #mainPrediction {
@@ -565,12 +535,7 @@ body.theme-clean #mainPrediction {
   -webkit-text-fill-color: var(--text-1);
   filter: none;
 }
-#mainPrediction.idle {
-  background: var(--text-3);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: none;
-}
+
 
 .confidence-value {
   font-size: 13px;
@@ -581,7 +546,7 @@ body.theme-clean #mainPrediction {
   padding: 20px;
 }
 .word-display {
-  background: rgba(0, 0, 0, 0.3);
+  background: color-mix(in srgb, var(--bg-deep) 30%, transparent);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -614,7 +579,7 @@ body.theme-clean .word-display {
 }
 .btn {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--text-1) 5%, transparent);
   border: 1px solid var(--border);
   color: var(--text-1);
   padding: 10px;
@@ -646,17 +611,38 @@ body.theme-neobrutalism .btn:active {
 }
 
 /* Eye-catching Soft Pastel Neobrutalism Cards */
-body.theme-neobrutalism .camera-card { background: #FFE259 !important; color: #000000; }
+body.theme-neobrutalism .camera-card {
+  background: #ffe259 !important;
+  color: #000000;
+}
 body.theme-neobrutalism .side-panel .card:nth-child(1),
-body.theme-neobrutalism .prediction-card { background: #FF9A9E !important; color: #000000; }
+body.theme-neobrutalism .prediction-card {
+  background: #ff9a9e !important;
+  color: #000000;
+}
 body.theme-neobrutalism .side-panel .card:nth-child(2),
-body.theme-neobrutalism .word-card { background: #A1C4FD !important; color: #000000; }
+body.theme-neobrutalism .word-card {
+  background: #a1c4fd !important;
+  color: #000000;
+}
 body.theme-neobrutalism .side-panel .card:nth-child(3),
-body.theme-neobrutalism .stats-card { background: #BFF098 !important; color: #000000; }
+body.theme-neobrutalism .stats-card {
+  background: #bff098 !important;
+  color: #000000;
+}
 body.theme-neobrutalism .side-panel .card:nth-child(4),
-body.theme-neobrutalism .log-card { background: #E0C3FC !important; color: #000000; }
-body.theme-neobrutalism .stats-global-card { background: #E0C3FC !important; color: #000000; }
-body.theme-neobrutalism .matrix-container { background: #BFF098 !important; color: #000000; }
+body.theme-neobrutalism .log-card {
+  background: #e0c3fc !important;
+  color: #000000;
+}
+body.theme-neobrutalism .stats-global-card {
+  background: #e0c3fc !important;
+  color: #000000;
+}
+body.theme-neobrutalism .matrix-container {
+  background: #bff098 !important;
+  color: #000000;
+}
 
 /* ── Neobrutalism Semantic Buttons (Earth Tones) ──────────────────────────────────────────────── */
 body.theme-neobrutalism .neo-btn-primary,
@@ -720,30 +706,69 @@ body.theme-neobrutalism .neo-btn-info {
 }
 
 /* Specific Buttons Override for Neobrutalism */
-body.theme-neobrutalism #btnToggleCamera.start { background: var(--neo-btn-success) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnToggleCamera.stop { background: var(--neo-btn-danger) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnSpace { background: var(--neo-btn-success) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnBackspace { background: var(--neo-btn-warning) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnClear { background: var(--neo-btn-danger) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnSpeak { background: var(--neo-btn-info) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnFlashcard { background: var(--neo-btn-primary) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnWordChallenge { background: #FF9A9E !important; color: #000000 !important; }
+body.theme-neobrutalism #btnToggleCamera.start {
+  background: var(--neo-btn-success) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnToggleCamera.stop {
+  background: var(--neo-btn-danger) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnSpace {
+  background: var(--neo-btn-success) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnBackspace {
+  background: var(--neo-btn-warning) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnClear {
+  background: var(--neo-btn-danger) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnSpeak {
+  background: var(--neo-btn-info) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnFlashcard {
+  background: var(--neo-btn-primary) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnWordChallenge {
+  background: #ff9a9e !important;
+  color: #000000 !important;
+}
 
 /* Overlay Buttons Override for Neobrutalism */
-body.theme-neobrutalism #btnFlashcardHint { background: var(--neo-btn-success) !important; color: #000000 !important; }
-body.theme-neobrutalism #btnAchievements { background: #FFD700 !important; color: #000000 !important; }
-body.theme-neobrutalism .flashcard-btn-skip { background: #E0C3FC !important; color: #000000 !important; }
-body.theme-neobrutalism .flashcard-btn-stop { background: var(--neo-btn-danger) !important; color: #000000 !important; }
-body.theme-neobrutalism #achievementsModal .btn-danger { background: var(--neo-btn-danger) !important; color: #000000 !important; }
+body.theme-neobrutalism #btnFlashcardHint {
+  background: var(--neo-btn-success) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #btnAchievements {
+  background: #ffd700 !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism .flashcard-btn-skip {
+  background: #e0c3fc !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism .flashcard-btn-stop {
+  background: var(--neo-btn-danger) !important;
+  color: #000000 !important;
+}
+body.theme-neobrutalism #achievementsModal .btn-danger {
+  background: var(--neo-btn-danger) !important;
+  color: #000000 !important;
+}
 
 .btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: color-mix(in srgb, var(--text-1) 10%, transparent);
+  border-color: color-mix(in srgb, var(--text-1) 20%, transparent);
 }
 .btn-primary {
-  background: rgba(108, 99, 255, 0.2);
-  border-color: rgba(108, 99, 255, 0.4);
-  color: #a78bfa;
+  background: color-mix(in srgb, var(--accent-1) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent-1) 40%, transparent);
+  color: color-mix(in srgb, var(--accent-1) 80%, white);
 }
 body.theme-clean .btn-primary {
   background: var(--accent-1);
@@ -755,9 +780,9 @@ body.theme-neobrutalism .btn-primary {
   color: #1a1a1a;
 }
 .btn.stop {
-  background: rgba(255, 107, 107, 0.1);
-  color: #ff6b6b;
-  border-color: rgba(255, 107, 107, 0.3);
+  background: color-mix(in srgb, var(--accent-3) 10%, transparent);
+  color: var(--accent-3);
+  border-color: color-mix(in srgb, var(--accent-3) 30%, transparent);
 }
 body.theme-clean .btn.stop {
   background: #fee2e2;
@@ -771,9 +796,9 @@ body.theme-neobrutalism .btn.stop {
 
 /* Nyalakan Kamera (Green) */
 .btn.start {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-  border-color: rgba(34, 197, 94, 0.4);
+  background: color-mix(in srgb, var(--success) 15%, transparent);
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 40%, transparent);
 }
 body.theme-clean .btn.start {
   background: #dcfce7;
@@ -812,7 +837,7 @@ body.theme-clean table.matrix td {
   font-weight: 600;
 }
 table.matrix th {
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--text-1) 5%, transparent);
   color: var(--text-2);
   font-weight: normal;
 }
@@ -867,7 +892,7 @@ body.theme-neobrutalism #serverStats {
 #progress-bar {
   width: 100%;
   height: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--text-1) 10%, transparent);
   border-radius: 6px;
   margin-top: 10px;
   overflow: hidden;
@@ -890,7 +915,7 @@ body.theme-clean #progress-bar {
   transition: width 0.15s linear;
 }
 #progress-fill[data-stage="mid"] {
-  background: linear-gradient(90deg, #f59e0b, #fcd34d);
+  background: linear-gradient(90deg, var(--achievement-unlocked), #fcd34d);
 }
 #progress-fill[data-stage="done"] {
   background: linear-gradient(90deg, #10b981, #34d399);
@@ -940,8 +965,8 @@ body.theme-neobrutalism .theme-btn:hover {
   color: #000000 !important;
 }
 .theme-btn.active {
-  background: var(--accent-1);
-  color: #fff;
+  background: color-mix(in srgb, var(--accent-1) 15%, transparent);
+  color: var(--accent-1);
 }
 body.theme-neobrutalism .theme-btn.active {
   background: #ff66c4 !important;
@@ -1010,11 +1035,11 @@ body.theme-neobrutalism .nav-link:hover {
   color: #000000 !important;
 }
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--text-1) 10%, transparent);
 }
 .nav-link.active {
   background: var(--accent-1);
-  color: #fff;
+  color: var(--text-1);
   opacity: 1;
 }
 body.theme-clean .nav-link.active {
@@ -1032,7 +1057,7 @@ body.theme-neobrutalism .nav-link.active {
 .flashcard-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(5, 8, 16, 1);
+  background: color-mix(in srgb, var(--bg-deep) 100%, transparent);
   z-index: 1000;
   display: none;
   align-items: center;
@@ -1056,7 +1081,7 @@ body.theme-neobrutalism .flashcard-overlay {
 
 /* Peek mode when user asks for a hint */
 .flashcard-overlay.peek-mode {
-  background: rgba(5, 8, 16, 0.1) !important;
+  background: color-mix(in srgb, var(--bg-deep) 10%, transparent) !important;
   backdrop-filter: blur(2px) !important;
   -webkit-backdrop-filter: blur(2px) !important;
 }
@@ -1068,11 +1093,11 @@ body.theme-neobrutalism .flashcard-overlay.peek-mode {
 }
 
 .flashcard-timer {
-  background: rgba(255, 107, 107, 0.2);
-  border: 1px solid rgba(255, 107, 107, 0.5);
+  background: color-mix(in srgb, var(--accent-3) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-3) 50%, transparent);
   padding: 8px 16px;
   border-radius: 20px;
-  color: #ff6b6b;
+  color: var(--accent-3);
   font-weight: 700;
   font-family: var(--font-display);
   font-size: 22px;
@@ -1106,11 +1131,10 @@ body.theme-neobrutalism .flashcard-timer {
   font-size: 140px;
   font-family: var(--font-display);
   font-weight: 800;
-  background: linear-gradient(135deg, #ffffff 0%, #a78bfa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-1);
+  background: none;
+  filter: none;
   line-height: 1;
-  filter: drop-shadow(0 4px 15px rgba(108, 99, 255, 0.4));
 }
 body.theme-clean .flashcard-target {
   background: transparent;
@@ -1180,9 +1204,9 @@ body.theme-neobrutalism .flashcard-status {
 
 .flashcard-btn-skip {
   padding: 12px 28px !important;
-  background: rgba(108, 99, 255, 0.2);
-  border: 1px solid rgba(108, 99, 255, 0.4);
-  color: #a78bfa;
+  background: color-mix(in srgb, var(--accent-1) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-1) 40%, transparent);
+  color: color-mix(in srgb, var(--accent-1) 80%, white);
   font-size: 14px;
   font-weight: 600;
   border-radius: var(--radius-sm);
@@ -1242,8 +1266,10 @@ body.theme-clean .guide-image-container {
     0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
 }
 body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-card);
   border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
 }
 
 /* Mobile responsive layout fixes */
@@ -1323,13 +1349,13 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
 .confidence-track {
   position: relative;
   height: 14px;
-  background: rgba(255, 255, 255, 0.15);
+  background: color-mix(in srgb, var(--text-1) 15%, transparent);
   border-radius: 7px;
   overflow: hidden;
 }
 .confidence-fill {
   height: 100%;
-  background: #22c55e;
+  background: var(--success);
   border-radius: 7px;
   /* Use linear for real-time smoothness, NOT ease */
   transition: width 0.15s linear;
@@ -1342,8 +1368,8 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   transform: translateY(-50%);
   font-size: 10px;
   font-weight: 800;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: var(--text-1);
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--bg-deep) 50%, transparent);
   line-height: 1;
 }
 
@@ -1355,9 +1381,9 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #0d0d0d;
+  background: var(--bg-deep);
   gap: 10px;
-  color: rgba(255, 255, 255, 0.25);
+  color: color-mix(in srgb, var(--text-1) 25%, transparent);
   pointer-events: none;
   z-index: 2;
 }
@@ -1365,11 +1391,11 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   margin: 0;
   font-weight: 700;
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.4);
+  color: color-mix(in srgb, var(--text-1) 40%, transparent);
 }
 .camera-placeholder span {
   font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.2);
+  color: color-mix(in srgb, var(--text-1) 20%, transparent);
 }
 
 /* ── Hand Placement Guide (Task 2) ─────────────────────────────── */
@@ -1398,7 +1424,7 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
   position: absolute;
   width: 18px;
   height: 18px;
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: color-mix(in srgb, var(--text-1) 30%, transparent);
   border-style: solid;
 }
 .guide-corner.tl {
@@ -1427,7 +1453,7 @@ body:not(.theme-clean):not(.theme-neobrutalism) .guide-image-container {
 }
 .guide-text {
   font-size: 0.66rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: color-mix(in srgb, var(--text-1) 30%, transparent);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin: 0;
@@ -1458,18 +1484,18 @@ body.theme-neobrutalism .status-badge {
   box-shadow: 2px 2px 0 0 #000;
 }
 .status-badge.connecting {
-  background: #ffc107;
+  background: var(--warning);
   color: #1a1a1a;
   animation: pulse-opacity 1.2s ease-in-out infinite;
 }
 .status-badge.connected {
-  background: #22c55e;
-  color: #fff;
+  background: var(--accent-muted);
+  color: var(--text-1);
   animation: none;
 }
 .status-badge.error {
-  background: #ef4444;
-  color: #fff;
+  background: var(--accent-3);
+  color: var(--text-1);
   animation: none;
 }
 
@@ -1517,7 +1543,7 @@ body.theme-neobrutalism .status-badge {
   color: var(--success);
 }
 .log-msg.error {
-  color: #ff6b6b;
+  color: var(--accent-3);
 }
 .log-msg.warn {
   color: var(--warning);
@@ -1547,12 +1573,12 @@ body.theme-neobrutalism .log-msg.warn {
 }
 
 .btn.btn-danger {
-  background: rgba(255, 107, 107, 0.1);
-  color: #ff6b6b;
-  border-color: rgba(255, 107, 107, 0.3);
+  background: color-mix(in srgb, var(--accent-3) 10%, transparent);
+  color: var(--accent-3);
+  border-color: color-mix(in srgb, var(--accent-3) 30%, transparent);
 }
 .btn.btn-danger:hover {
-  background: rgba(255, 107, 107, 0.2);
+  background: color-mix(in srgb, var(--accent-3) 20%, transparent);
 }
 body.theme-clean .btn.btn-danger {
   background: #fee2e2;
@@ -1565,17 +1591,17 @@ body.theme-neobrutalism .btn.btn-danger {
 }
 
 .btn.btn-tts {
-  background: rgba(108, 99, 255, 0.15);
+  background: color-mix(in srgb, var(--accent-1) 15%, transparent);
   color: var(--accent-1);
-  border-color: rgba(108, 99, 255, 0.35);
+  border-color: color-mix(in srgb, var(--accent-1) 35%, transparent);
 }
 .btn.btn-tts:hover {
-  background: rgba(108, 99, 255, 0.25);
+  background: color-mix(in srgb, var(--accent-1) 25%, transparent);
 }
 .btn.btn-tts.speaking {
-  background: rgba(0, 230, 118, 0.15);
+  background: color-mix(in srgb, var(--success) 15%, transparent);
   color: var(--success);
-  border-color: rgba(0, 230, 118, 0.35);
+  border-color: color-mix(in srgb, var(--success) 35%, transparent);
   animation: pulse-opacity 0.8s ease-in-out infinite;
 }
 body.theme-clean .btn.btn-tts {
@@ -1620,7 +1646,7 @@ body.theme-neobrutalism .cursor-blink {
   flex-wrap: wrap;
   min-height: 28px;
   padding: 5px 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: color-mix(in srgb, var(--bg-deep) 20%, transparent);
   border-radius: var(--radius-sm);
   margin-bottom: 10px;
   align-items: center;
@@ -1639,13 +1665,13 @@ body.theme-neobrutalism .letter-history {
   font-weight: 800;
   padding: 2px 7px;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--text-1) 10%, transparent);
   color: var(--text-1);
   line-height: 1.5;
   transition: none; /* no animation — performance */
 }
 .letter-chip:last-child {
-  background: rgba(108, 99, 255, 0.3);
+  background: color-mix(in srgb, var(--accent-1) 30%, transparent);
   color: var(--accent-1);
 }
 .letter-chip.is-space {
@@ -1754,7 +1780,7 @@ body.theme-neobrutalism #kontrolKoleksiCard {
   opacity: 1;
   border-bottom-color: var(--success);
   transform: scale(1);
-  text-shadow: 0 0 15px rgba(0, 230, 118, 0.6);
+  text-shadow: 0 0 15px color-mix(in srgb, var(--success) 60%, transparent);
 }
 body.theme-clean .challenge-letter {
   color: var(--text-3);
@@ -1809,13 +1835,13 @@ body.theme-neobrutalism .challenge-letter.done {
 .badge-item.badge-unlocked {
   background: linear-gradient(
     135deg,
-    rgba(255, 215, 0, 0.1),
-    rgba(255, 215, 0, 0.05)
+    color-mix(in srgb, var(--achievement-unlocked) 10%, transparent),
+    color-mix(in srgb, var(--achievement-unlocked) 5%, transparent)
   );
-  border-color: #ffd700;
+  border-color: var(--achievement-unlocked);
   opacity: 1;
   filter: none;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--achievement-unlocked) 15%, transparent);
 }
 .badge-icon {
   font-size: 32px;
@@ -1826,8 +1852,8 @@ body.theme-neobrutalism .challenge-letter.done {
   justify-content: center;
   border-radius: 50%;
   background: var(--bg-card);
-  color: #ffd700;
-  border: 2px solid #ffd700;
+  color: var(--achievement-unlocked);
+  border: 2px solid var(--achievement-unlocked);
 }
 .badge-locked .badge-icon {
   color: var(--text-3);
@@ -1847,8 +1873,8 @@ body.theme-neobrutalism .challenge-letter.done {
   color: var(--text-1);
 }
 .badge-unlocked .badge-title {
-  color: #ffd700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  color: var(--achievement-unlocked);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--achievement-unlocked) 50%, transparent);
 }
 .badge-desc {
   font-size: 0.85rem;
@@ -1878,13 +1904,13 @@ body.theme-neobrutalism .badge-locked .badge-icon {
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-card);
-  border: 2px solid #ffd700;
+  border: 2px solid var(--achievement-unlocked);
   border-radius: 50px;
   padding: 12px 24px;
   display: flex;
   align-items: center;
   gap: 15px;
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--achievement-unlocked) 20%, transparent);
   z-index: 9999;
   opacity: 0;
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1903,7 +1929,7 @@ body.theme-neobrutalism .badge-locked .badge-icon {
 .toast-title {
   font-weight: 700;
   font-size: 14px;
-  color: #ffd700;
+  color: var(--achievement-unlocked);
 }
 .toast-desc {
   font-size: 16px;
